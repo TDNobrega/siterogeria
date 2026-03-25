@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Custom Font Files (place in /public/assets/fonts/ when available) ───── */
+@font-face {
+  font-family: 'URW Form';
+  src: url('/assets/fonts/URWForm-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'URW Form';
+  src: url('/assets/fonts/URWForm-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Avenir LT Std';
+  src: url('/assets/fonts/AvenirLTStd-Roman.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Avenir LT Std';
+  src: url('/assets/fonts/AvenirLTStd-Heavy.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+/* ── Base Reset ──────────────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Nunito Sans', 'DM Sans', system-ui, sans-serif;
+  color: #1A1A1A;
+  background-color: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Typography Scale ────────────────────────────────────────────────────── */
+@layer base {
+  h1, h2, h3, h4 {
+    font-family: 'URW Form', 'DM Sans', system-ui, sans-serif;
+    font-weight: 700;
+    color: #1A1A1A;
+    letter-spacing: -0.02em;
+  }
+  p, li, span {
+    font-family: 'Nunito Sans', 'DM Sans', sans-serif;
+    line-height: 1.7;
+  }
+}
+
+/* ── Component Layer ─────────────────────────────────────────────────────── */
+@layer components {
+
+  /* Section layout */
+  .section-padding { @apply py-20 px-4 sm:px-6 lg:px-8; }
+  .container-max   { @apply max-w-7xl mx-auto; }
+
+  /* Section header helpers */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 font-subtitle text-xs font-semibold
+           tracking-[0.15em] uppercase mb-4;
+    color: theme('colors.primary');
+  }
+  .eyebrow::before,
+  .eyebrow::after {
+    content: '';
+    @apply block w-6 h-px;
+    background-color: theme('colors.primary');
+  }
+  .section-title {
+    @apply font-title font-bold leading-tight
+           text-3xl md:text-4xl lg:text-[2.5rem];
+    color: theme('colors.ink');
+  }
+  .section-subtitle {
+    @apply font-body text-lg leading-relaxed;
+    color: theme('colors.muted');
+  }
+  .divider {
+    @apply w-10 h-px;
+    background-color: theme('colors.primary');
+  }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
+
+  /* Primary CTA — #E29571 */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-primary text-white font-subtitle font-semibold
+           px-7 py-3.5 rounded-lg text-sm tracking-wide
+           hover:bg-support transition-colors duration-200
+           shadow-button hover:shadow-none;
+  }
+
+  /* Primary large */
+  .btn-primary-lg {
+    @apply inline-flex items-center justify-center gap-3
+           bg-primary text-white font-subtitle font-semibold
+           px-9 py-4 rounded-lg text-base tracking-wide
+           hover:bg-support transition-colors duration-200
+           shadow-button hover:shadow-none;
+  }
+
+  /* Outline button */
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2
+           border border-primary text-primary font-subtitle font-semibold
+           px-7 py-3.5 rounded-lg text-sm tracking-wide
+           hover:bg-primary hover:text-white transition-colors duration-200;
+  }
+
+  /* Ghost (on dark backgrounds) */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           border border-white/60 text-white font-subtitle font-semibold
+           px-7 py-3.5 rounded-lg text-sm tracking-wide
+           hover:bg-white/10 transition-colors duration-200;
+  }
+
+  /* WhatsApp — keeps green for brand recognition */
+  .btn-whatsapp {
+    @apply inline-flex items-center justify-center gap-2.5
+           bg-[#25D366] text-white font-subtitle font-semibold
+           px-7 py-3.5 rounded-lg text-sm tracking-wide
+           hover:bg-[#1ebe5d] transition-colors duration-200;
+  }
+
+  /* ── Cards ───────────────────────────────────────────────────────────── */
+  .card {
+    @apply bg-white rounded-2xl border border-border
+           shadow-card hover:shadow-card-hover hover:-translate-y-0.5
+           transition-all duration-300;
+  }
+
+  .card-primary {
+    @apply bg-white rounded-2xl border border-secondary/50
+           shadow-card hover:shadow-card-hover hover:border-primary/40
+           hover:-translate-y-0.5 transition-all duration-300;
+  }
+}
