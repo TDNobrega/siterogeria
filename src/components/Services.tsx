@@ -93,9 +93,8 @@ export default function Services() {
 
               {/* CTA */}
               <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href={service.id === 'professores' ? '/professores' : WHATSAPP_URL}
+                {...(service.id === 'professores' ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
                 className="mt-8 w-full text-center btn-primary justify-center"
               >
                 Quero Consultar Este Serviço
