@@ -100,15 +100,15 @@ export default function Professores() {
 
           {/* ── 2. HERO ───────────────────────────────────────────────── */}
           <section className="bg-ink text-white pt-10 pb-20 px-4 sm:px-6">
-            <div className="max-w-5xl mx-auto text-left">
-              <h1 className="font-title font-bold text-3xl sm:text-4xl lg:text-5xl leading-[1.1] mb-6">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="font-title font-bold text-3xl sm:text-4xl lg:text-5xl leading-[1.1] mb-6 text-left">
                 Professor do Estado do RJ:{' '}
                 <span className="text-primary">
                   O que você recebe hoje condiz com a Lei e com a sua carreira?
                 </span>
               </h1>
 
-              <p className="font-body text-white/75 text-lg max-w-2xl mb-8 leading-relaxed">
+              <p className="font-body text-white/75 text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
                 Identificamos erros frequentes no cálculo do Piso Nacional, triênios congelados
                 e verbas nunca pagas. Recupere valores que o Estado deixou de depositar.
               </p>
@@ -126,7 +126,7 @@ export default function Professores() {
               </a>
 
               {/* Trust strip */}
-              <div className="mt-12 flex flex-wrap items-center gap-6">
+              <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
                 {[
                   '🔒 Dados protegidos por LGPD',
                   '📱 Atendimento 100% remoto',
