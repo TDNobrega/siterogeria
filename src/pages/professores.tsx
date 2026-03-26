@@ -495,7 +495,12 @@ export default function Professores() {
             <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center
                             justify-between gap-3 text-xs font-subtitle text-white/40">
               <p>© 2025 {FIRM_NAME}. Todos os direitos reservados.</p>
-              <p>CNPJ: {FIRM_CNPJ} · Inscrita na OAB/RJ</p>
+              <div className="flex items-center gap-4">
+                <p>CNPJ: {FIRM_CNPJ} · Inscrita na OAB/RJ</p>
+                <a href="/privacidade" className="hover:text-white transition-colors whitespace-nowrap">
+                  Política de Privacidade
+                </a>
+              </div>
             </div>
           </div>
         </footer>

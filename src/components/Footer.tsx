@@ -178,9 +178,15 @@ export default function Footer() {
           <p className="font-body text-gray-500 text-sm text-center">
             © {year} {FIRM_NAME}. Todos os direitos reservados.
           </p>
-          <p className="font-body text-gray-600 text-xs text-center">
-            Este site é meramente informativo e não configura prestação de serviços advocatícios.
-          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <p className="font-body text-gray-600 text-xs text-center">
+              Este site é meramente informativo e não configura prestação de serviços advocatícios.
+            </p>
+            <Link href="/privacidade"
+              className="font-subtitle text-xs text-gray-500 hover:text-primary transition-colors whitespace-nowrap">
+              Política de Privacidade
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
