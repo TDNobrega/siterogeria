@@ -5,7 +5,7 @@ import '../styles/globals.css'
 import CookieBanner from '../components/CookieBanner'
 
 // ── Substitua pelos seus IDs reais ───────────────────────────────────────────
-const GA4_ID = 'G-XXXXXXXXXX'          // Google Analytics 4 — substitua pelo seu ID
+const GA4_ID = 'G-4F6RKNCT7F'          // Google Analytics 4
 const META_PIXEL_ID = 'XXXXXXXXXXXXXXX' // Meta Pixel — substitua pelo seu ID
 // ────────────────────────────────────────────────────────────────────────────
 
@@ -30,7 +30,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       {/* Google Analytics 4 — carregado apenas com consentimento */}
-      {consent === true && GA4_ID !== 'G-XXXXXXXXXX' && (
+      {consent === true && (
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${GA4_ID}`}
