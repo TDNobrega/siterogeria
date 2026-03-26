@@ -6,18 +6,19 @@ export default function Hero() {
       id="inicio"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{
+        backgroundColor: '#000000',
         backgroundImage: "url('/assets/banner.webp'), url('/assets/banner.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundSize: 'contain',
+        backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',
       }}
     >
       {/* Overlay — dark base + subtle primary warmth */}
-      <div className="absolute inset-0 bg-ink/75" />
+      <div className="absolute inset-0 bg-ink/60" />
       <div className="absolute inset-0 bg-primary/10" />
 
       <div className="relative z-10 container-max mx-auto px-4 sm:px-6 lg:px-8
-                      text-center py-32 pt-40">
+                      text-center py-16">
 
         {/* H1 */}
         <h1 className="font-title font-bold text-white leading-[1.1]
@@ -71,7 +72,6 @@ export default function Hero() {
           {[
             { icon: '⚖️', text: 'Direito dos Professores' },
             { icon: '🏛️', text: 'Direito Previdenciário' },
-            { icon: '📍', text: 'Campo Grande, Rio de Janeiro' },
           ].map((item) => (
             <div key={item.text}
               className="flex items-center gap-2 text-white/60">

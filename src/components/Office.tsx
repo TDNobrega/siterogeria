@@ -3,11 +3,13 @@ const officePhotos = [
     src: '/assets/office-1.jpg',
     webp: '/assets/office-1.webp',
     alt: 'Recepção e sala de espera — Rogéria Oliveira Advocacia',
+    fit: 'object-contain bg-brand-light',
   },
   {
     src: '/assets/office-2.jpg',
     webp: '/assets/office-2.webp',
     alt: 'Dra. Rogéria no consultório jurídico',
+    fit: 'object-cover object-top',
   },
 ]
 
@@ -39,15 +41,14 @@ export default function Office() {
           {officePhotos.map((photo) => (
             <div
               key={photo.src}
-              className="relative overflow-hidden rounded-2xl group aspect-[4/3] shadow-lg"
+              className={`relative overflow-hidden rounded-2xl group shadow-lg aspect-[3/4] ${photo.fit.includes('bg-') ? photo.fit.split(' ').filter(c => c.startsWith('bg-')).join(' ') : ''}`}
             >
               <picture>
                 <source srcSet={photo.webp} type="image/webp" />
                 <img
                   src={photo.src}
                   alt={photo.alt}
-                  className="w-full h-full object-cover transition-transform duration-700
-                             group-hover:scale-105"
+                  className={`w-full h-full transition-transform duration-700 group-hover:scale-105 ${photo.fit}`}
                   loading="lazy"
                   decoding="async"
                 />

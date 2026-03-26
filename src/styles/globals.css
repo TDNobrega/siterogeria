@@ -25,12 +25,13 @@
 }
 
 /* ── Base Reset ──────────────────────────────────────────────────────────── */
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
   font-family: 'Nunito Sans', 'DM Sans', system-ui, sans-serif;
   color: #1A1A1A;
   background-color: #FFFFFF;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -78,11 +78,11 @@ export default function Testimonials() {
         </div>
 
         {/* Testimonial Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {testimonials.map((t) => (
             <div
               key={t.name}
-              className="card bg-white p-7 flex flex-col"
+              className="card bg-white p-4 sm:p-7 flex flex-col min-w-0"
             >
               {/* Quote icon */}
               <svg className="w-7 h-7 text-secondary mb-4 flex-shrink-0"

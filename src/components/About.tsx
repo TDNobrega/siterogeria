@@ -78,7 +78,7 @@ export default function About() {
                 <strong className="text-ink font-semibold">professores</strong> e
                 trabalhadores com questões junto ao{' '}
                 <strong className="text-ink font-semibold">INSS</strong>, com
-                atuação em Campo Grande, Rio de Janeiro.
+                atuação em todo o Brasil.
               </p>
               <p>
                 Nossa missão é garantir que cada cliente receba atendimento
