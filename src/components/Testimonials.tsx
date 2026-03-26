@@ -3,7 +3,7 @@ const testimonials = [
     name: 'Maria Aparecida S.',
     role: 'Professora Municipal – Rio de Janeiro',
     stars: 5,
-    text: 'Tive descontos indevidos no meu contracheque por quase dois anos. Tentei resolver sozinha, sem sucesso. Com a Dra. Rogéria, em poucos meses recebi tudo de volta, com correção. Atendimento humano e profissional do início ao fim.',
+    text: 'Tive descontos indevidos no meu contracheque por quase dois anos. Tentei resolver sozinha, sem sucesso. Com a Dra. Rogéria consegui tudo de volta. Atendimento humano e profissional do início ao fim.',
     initial: 'M',
   },
   {
@@ -17,7 +17,7 @@ const testimonials = [
     name: 'Ana Lúcia M.',
     role: 'Professora Estadual – RJ',
     stars: 5,
-    text: 'Estava lutando para conseguir minha aposentadoria especial como professora há mais de um ano. A equipe da Rogéria Advocacia entrou com a ação e em menos de 6 meses consegui meu benefício. Ótima equipe, muito competente!',
+    text: 'Estava lutando para conseguir minha aposentadoria especial como professora há mais de um ano. A equipe da Rogéria Advocacia entrou com a ação e consegui meu benefício. Ótima equipe, muito competente!',
     initial: 'A',
   },
   {

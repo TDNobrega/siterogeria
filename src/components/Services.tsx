@@ -106,7 +106,7 @@ export default function Services() {
 
         {/* Bottom note */}
         <p className="text-center font-subtitle text-sm text-muted mt-10">
-          Primeira consulta gratuita · Atendimento presencial e online · Campo Grande - RJ e todo o Brasil
+          Primeira consulta gratuita · Atendimento presencial e online · Todo o Brasil
         </p>
       </div>
     </section>
