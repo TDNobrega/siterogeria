@@ -250,7 +250,7 @@ export default function Professores() {
                     as regras de transição e os benefícios do magistério pode fazer a diferença
                     de anos na sua aposentadoria.
                   </p>
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-8 mx-auto lg:mx-0 w-fit">
                     {[
                       'Aposentadoria especial do magistério',
                       'Regras de transição da Reforma da Previdência',
@@ -266,16 +266,18 @@ export default function Professores() {
                       </li>
                     ))}
                   </ul>
-                  <a href="#formulario"
-                    className="inline-flex items-center gap-2 bg-ink hover:bg-ink/80
-                               text-white font-subtitle font-bold px-7 py-3.5 rounded-full
-                               transition-colors">
-                    Simular minha aposentadoria
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2}
-                      viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </a>
+                  <div className="flex justify-center lg:justify-start">
+                    <a href="#formulario"
+                      className="inline-flex items-center gap-2 bg-ink hover:bg-ink/80
+                                 text-white font-subtitle font-bold px-7 py-3.5 rounded-full
+                                 transition-colors">
+                      Simular minha aposentadoria
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2}
+                        viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </a>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
