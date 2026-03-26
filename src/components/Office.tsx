@@ -44,10 +44,10 @@ export default function Office() {
           </div>
 
           {/* Vídeo da Dra. Rogéria */}
-          <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] bg-black">
+          <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] bg-black flex items-center justify-center">
             <video
               src="/assets/rogeria-video.mp4"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               autoPlay
               loop
               muted
