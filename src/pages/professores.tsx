@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { FIRM_NAME, FIRM_CNPJ, FIRM_PHONE } from '../lib/constants'
 
-const WA_URL = 'https://wa.me/5521969401414?text=' + encodeURIComponent('Olá, gostaria de analisar meu contracheque.')
+const WA_URL = 'https://wa.me/5521979522553?text=' + encodeURIComponent('Olá, gostaria de analisar meu contracheque.')
 
 // ── SUBSTITUA pela URL de incorporação do seu Google Forms ──────────────────
 // Abra seu formulário → Enviar → </> Incorporar → copie o src do iframe
