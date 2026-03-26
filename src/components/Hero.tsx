@@ -7,10 +7,6 @@ export default function Hero() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{
         backgroundColor: '#000000',
-        backgroundImage: "url('/assets/banner.webp'), url('/assets/banner.jpg')",
-        backgroundSize: 'contain',
-        backgroundPosition: 'center center',
-        backgroundRepeat: 'no-repeat',
       }}
     >
       {/* Overlay — dark base + subtle primary warmth */}

@@ -1,18 +1,3 @@
-const officePhotos = [
-  {
-    src: '/assets/office-1.jpg',
-    webp: '/assets/office-1.webp',
-    alt: 'Recepção e sala de espera — Rogéria Oliveira Advocacia',
-    fit: 'object-contain bg-brand-light',
-  },
-  {
-    src: '/assets/office-2.jpg',
-    webp: '/assets/office-2.webp',
-    alt: 'Dra. Rogéria no consultório jurídico',
-    fit: 'object-cover object-top',
-  },
-]
-
 export default function Office() {
   return (
     <section id="escritorio" className="section-padding bg-white">
@@ -36,31 +21,40 @@ export default function Office() {
           </p>
         </div>
 
-        {/* Photo Grid — 2 real photos side by side */}
+        {/* Grid — foto do escritório + vídeo da Dra. Rogéria */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {officePhotos.map((photo) => (
-            <div
-              key={photo.src}
-              className={`relative overflow-hidden rounded-2xl group shadow-lg aspect-[3/4] ${photo.fit.includes('bg-') ? photo.fit.split(' ').filter(c => c.startsWith('bg-')).join(' ') : ''}`}
-            >
-              <picture>
-                <source srcSet={photo.webp} type="image/webp" />
-                <img
-                  src={photo.src}
-                  alt={photo.alt}
-                  className={`w-full h-full transition-transform duration-700 group-hover:scale-105 ${photo.fit}`}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </picture>
-              {/* Gradient overlay on hover */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent
-                              to-transparent opacity-0 group-hover:opacity-100 transition-opacity
-                              duration-300 flex items-end p-6">
-                <p className="text-white font-subtitle font-medium text-sm">{photo.alt}</p>
-              </div>
+
+          {/* Foto do escritório */}
+          <div className="relative overflow-hidden rounded-2xl group shadow-lg aspect-[3/4] bg-brand-light">
+            <picture>
+              <source srcSet="/assets/office-1.webp" type="image/webp" />
+              <img
+                src="/assets/office-1.jpg"
+                alt="Recepção e sala de espera — Rogéria Oliveira Advocacia"
+                className="w-full h-full object-contain bg-brand-light transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent
+                            to-transparent opacity-0 group-hover:opacity-100 transition-opacity
+                            duration-300 flex items-end p-6">
+              <p className="text-white font-subtitle font-medium text-sm">Recepção e sala de espera — Rogéria Oliveira Advocacia</p>
             </div>
-          ))}
+          </div>
+
+          {/* Vídeo da Dra. Rogéria */}
+          <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] bg-black">
+            <video
+              src="/assets/rogeria-video.mp4"
+              className="w-full h-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+          </div>
+
         </div>
 
         {/* Address Banner */}
