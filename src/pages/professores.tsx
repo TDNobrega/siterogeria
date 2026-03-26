@@ -234,9 +234,9 @@ export default function Professores() {
           <section id="aposentadoria" className="py-20 px-4 sm:px-6 bg-[#F8F4EA]">
             <div className="max-w-5xl mx-auto">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
-                <div>
+                <div className="text-center lg:text-left">
                   <p className="font-subtitle text-xs font-semibold text-primary tracking-[0.15em]
-                                 uppercase flex items-center gap-2 mb-4">
+                                 uppercase flex items-center justify-center lg:justify-start gap-2 mb-4">
                     <span className="w-6 h-px bg-primary" />
                     Planejamento Previdenciário
                   </p>
@@ -516,7 +516,7 @@ export default function Professores() {
             </div>
             <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center
                             justify-between gap-3 text-xs font-subtitle text-white/40">
-              <p>© {new Date().getFullYear()} {FIRM_NAME}. Todos os direitos reservados.</p>
+              <p>© 2025 {FIRM_NAME}. Todos os direitos reservados.</p>
               <p>CNPJ: {FIRM_CNPJ} · Inscrita na OAB/RJ</p>
             </div>
           </div>

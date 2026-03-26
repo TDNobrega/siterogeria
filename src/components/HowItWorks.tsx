@@ -118,7 +118,7 @@ export default function HowItWorks() {
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-primary"
+            className="btn-primary mx-auto"
           >
             <WhatsAppIcon />
             Iniciar Meu Atendimento Agora

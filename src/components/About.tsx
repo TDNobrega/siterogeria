@@ -62,7 +62,7 @@ export default function About() {
 
           {/* ── Right: Text ── */}
           <div className="mt-10 lg:mt-0 text-center lg:text-left">
-            <p className="eyebrow">Sobre o Escritório</p>
+            <p className="eyebrow justify-center lg:justify-start">Sobre o Escritório</p>
 
             <h2 className="section-title mb-4">
               Advocacia com{' '}
