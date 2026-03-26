@@ -102,7 +102,8 @@ export default function Professores() {
           <section className="bg-ink text-white pt-10 pb-20 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="font-title font-bold text-3xl sm:text-4xl lg:text-5xl leading-[1.1] mb-6">
-                Professor do Estado do RJ:{' '}
+                Professor do Estado do RJ:
+                <br />
                 <span className="text-primary">
                   O que você recebe hoje condiz com a Lei e com a sua carreira?
                 </span>
