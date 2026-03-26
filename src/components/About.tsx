@@ -61,7 +61,7 @@ export default function About() {
           </div>
 
           {/* ── Right: Text ── */}
-          <div className="mt-10 lg:mt-0">
+          <div className="mt-10 lg:mt-0 text-center lg:text-left">
             <p className="eyebrow">Sobre o Escritório</p>
 
             <h2 className="section-title mb-4">
@@ -70,7 +70,7 @@ export default function About() {
               e Resultado
             </h2>
 
-            <div className="divider mb-8" />
+            <div className="divider mb-8 mx-auto lg:mx-0" />
 
             <div className="space-y-4 font-body text-muted text-base leading-relaxed">
               <p>
@@ -108,7 +108,7 @@ export default function About() {
             </div>
 
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
-              className="btn-primary">
+              className="btn-primary mx-auto lg:mx-0">
               Agendar Consulta Gratuita
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2}
                 viewBox="0 0 24 24">
