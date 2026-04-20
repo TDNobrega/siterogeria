@@ -101,12 +101,10 @@ export default function Professores() {
           {/* ── 2. HERO ───────────────────────────────────────────────── */}
           <section className="bg-ink text-white pt-10 pb-20 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto text-center">
-              <h1 className="font-title font-bold text-3xl sm:text-4xl lg:text-5xl leading-[1.1] mb-6 text-white">
+              <h1 className="font-title font-bold text-3xl sm:text-4xl lg:text-5xl leading-[1.1] mb-6 text-primary">
                 Professor Estadual do RJ:
                 <br />
-                <span className="text-primary">
-                  Recupere seus Direitos e Garanta o Valor Real do seu Salário.
-                </span>
+                Recupere seus Direitos e Garanta o Valor Real do seu Salário.
               </h1>
 
               <p className="font-body text-white/75 text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
