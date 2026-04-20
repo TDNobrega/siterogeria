@@ -1,16 +1,9 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { FIRM_NAME, FIRM_CNPJ, FIRM_PHONE } from '../lib/constants'
+import { supabase } from '../lib/supabase'
 
 const WA_URL = 'https://wa.me/5521979522553?text=' + encodeURIComponent('Olá, gostaria de analisar meu contracheque.')
-
-// ── SUBSTITUA pela URL de incorporação do seu Google Forms ──────────────────
-// Abra seu formulário → Enviar → </> Incorporar → copie o src do iframe
-const GOOGLE_FORMS_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeJ3pelL50ASsI0gzZko-691npUIvkIyTzwxWI3dUju9FGMNQ/viewform?embedded=true'
-// ────────────────────────────────────────────────────────────────────────────
-
-// Google Sheets — URL do Web App (Apps Script). Substitua após implantar.
-const SHEETS_URL = ''
 
 export default function Professores() {
   const [showExit, setShowExit] = useState(false)
@@ -36,32 +29,36 @@ export default function Professores() {
     setFormSending(true)
     setFormError('')
 
-    // 1. Envia e-mail com anexo via FormSubmit
-    const data = new FormData()
-    Object.entries(formData).forEach(([k, v]) => data.append(k, v))
-    if (formFile) data.append('contracheque', formFile)
-    data.append('_subject', 'Nova solicitação — Análise de Contracheque')
-    data.append('_captcha', 'false')
-
     try {
-      const res = await fetch('https://formsubmit.co/ajax/documentos@rogeriaoliveira.com', {
-        method: 'POST',
-        body: data,
-        headers: { 'Accept': 'application/json' },
-      })
+      let arquivo_nome: string | null = null
+      let arquivo_url:  string | null = null
 
-      // 2. Salva na planilha Google Sheets (fire-and-forget)
-      if (SHEETS_URL) {
-        fetch(SHEETS_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: JSON.stringify({ ...formData, arquivo: formFile?.name || '' }),
-          headers: { 'Content-Type': 'application/json' },
-        }).catch(() => {})
+      // 1. Upload do contracheque para o Supabase Storage (se houver arquivo)
+      if (formFile) {
+        const ext      = formFile.name.split('.').pop()
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        const { data: upload, error: uploadErr } = await supabase.storage
+          .from('contracheques')
+          .upload(fileName, formFile, { upsert: false })
+
+        if (uploadErr) throw uploadErr
+
+        arquivo_nome = formFile.name
+        const { data: urlData } = supabase.storage
+          .from('contracheques')
+          .getPublicUrl(upload.path)
+        arquivo_url = urlData.publicUrl
       }
 
-      if (res.ok) setFormSent(true)
-      else setFormError('Erro ao enviar. Por favor tente novamente.')
+      // 2. Salva lead no banco de dados via API
+      const res = await fetch('/api/submit-lead', {
+        method: 'POST',
+        body: JSON.stringify({ ...formData, arquivo_nome, arquivo_url }),
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      if (!res.ok) throw new Error('Erro na API')
+      setFormSent(true)
     } catch {
       setFormError('Erro ao enviar. Verifique sua conexão e tente novamente.')
     } finally {
