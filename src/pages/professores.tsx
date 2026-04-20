@@ -102,10 +102,10 @@ export default function Professores() {
           <section className="bg-ink text-white pt-10 pb-20 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="font-title font-bold text-3xl sm:text-4xl lg:text-5xl leading-[1.1] mb-6">
-                Professor do Estado do RJ:
+                Professor Estadual do RJ:
                 <br />
                 <span className="text-primary">
-                  O que você recebe hoje condiz com a Lei e com a sua carreira?
+                  Recupere seus Direitos e Garanta o Valor Real do seu Salário.
                 </span>
               </h1>
 
@@ -165,7 +165,7 @@ export default function Professores() {
                   {
                     icon: '🎓',
                     title: 'Nova Escola',
-                    desc: 'A progressão por mérito e formação muitas vezes não é calculada corretamente, gerando diferenças salariais significativas ao longo da carreira.',
+                    desc: 'O Processo Nova Escola garante o pagamento de valores que foram suspensos indevidamente pelo estado para profissionais da educação. Se você trabalhava na rede estadual em 2002/2003, pode ter direito a receber essas diferenças com correção.',
                     tag: 'Muito comum',
                   },
                   {
@@ -176,7 +176,7 @@ export default function Professores() {
                   },
                   {
                     icon: '📅',
-                    title: 'Triênios e Interníveis',
+                    title: 'Triênios e Licenças não Concedidas',
                     desc: 'Avanços automáticos por tempo de serviço frequentemente são ignorados ou calculados com base errada, reduzindo o salário real do professor.',
                     tag: 'Retroativo',
                   },
@@ -352,8 +352,7 @@ export default function Professores() {
                   Especialistas em <span className="text-primary">Direito do Magistério RJ</span>
                 </h2>
                 <p className="font-body text-muted max-w-2xl mx-auto">
-                  Não somos um escritório generalista. Cada detalhe do estatuto do magistério
-                  do Estado do Rio de Janeiro é do nosso domínio.
+                  Proteção Jurídica completa para o Professor do Estado: Da sala à Aposentadoria.
                 </p>
               </div>
 
