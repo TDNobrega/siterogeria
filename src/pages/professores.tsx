@@ -38,7 +38,7 @@ export default function Professores() {
     data.append('_subject', 'Nova solicitação — Análise de Contracheque')
     data.append('_captcha', 'false')
     try {
-      const res = await fetch('https://formsubmit.co/ajax/contato@rogeriaoliveira.com', {
+      const res = await fetch('https://formsubmit.co/ajax/documentos@rogeriaoliveira.com', {
         method: 'POST',
         body: data,
         headers: { 'Accept': 'application/json' },
