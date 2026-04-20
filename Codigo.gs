@@ -39,6 +39,59 @@ function cfg() {
 }
 
 // ============================================================
+// LEADS - LANDING PAGE /professores
+// Recebe dados do formulário e salva na aba "Leads Professores"
+// ============================================================
+function doPost(e) {
+  try {
+    var dados = JSON.parse(e.postData.contents);
+
+    var planilha = SpreadsheetApp.getActiveSpreadsheet();
+    var aba = planilha.getSheetByName('Leads Professores');
+
+    if (!aba) {
+      aba = planilha.insertSheet('Leads Professores');
+      aba.appendRow(['Data/Hora', 'Nome', 'WhatsApp', 'E-mail', 'Situação', 'Mensagem', 'Arquivo']);
+      aba.getRange(1, 1, 1, 7)
+        .setFontWeight('bold')
+        .setBackground('#C5973A')
+        .setFontColor('#ffffff');
+      aba.setFrozenRows(1);
+      aba.setColumnWidth(1, 150);
+      aba.setColumnWidth(2, 200);
+      aba.setColumnWidth(3, 170);
+      aba.setColumnWidth(4, 210);
+      aba.setColumnWidth(5, 140);
+      aba.setColumnWidth(6, 300);
+      aba.setColumnWidth(7, 150);
+    }
+
+    var ultimaLinha = aba.getLastRow() + 1;
+    var telFormatado = dados.telefone || '';
+    var telNumeros   = telFormatado.replace(/\D/g, '');
+    var waNum        = telNumeros.startsWith('55') ? telNumeros : '55' + telNumeros;
+
+    aba.getRange(ultimaLinha, 1).setValue(new Date());
+    aba.getRange(ultimaLinha, 2).setValue(dados.nome     || '');
+    aba.getRange(ultimaLinha, 3).setFormula('=HYPERLINK("https://wa.me/' + waNum + '","' + telFormatado + '")');
+    aba.getRange(ultimaLinha, 4).setValue(dados.email    || '');
+    aba.getRange(ultimaLinha, 5).setValue(dados.situacao || '');
+    aba.getRange(ultimaLinha, 6).setValue(dados.mensagem || '');
+    aba.getRange(ultimaLinha, 7).setValue(dados.arquivo  || '');
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: 'ok' }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    Logger.log('ERRO doPost: ' + err.message);
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: 'error', msg: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// ============================================================
 // INSTALAR TRIGGER — executa verificarEmails a cada 15 minutos
 // ============================================================
 function instalarTrigger() {
