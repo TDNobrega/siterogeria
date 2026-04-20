@@ -1,6 +1,48 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getAdminSupabase } from '../../lib/supabase'
 
+const LIDERHUB_KEY        = process.env.LIDERHUB_API_KEY        || ''
+const LIDERHUB_CONNECTION = process.env.LIDERHUB_CONNECTION_ID  || ''
+const LIDERHUB_AGENT      = process.env.LIDERHUB_AGENT_ID       || ''
+
+// ── Helpers LiderHub ──────────────────────────────────────────────────────────
+async function liderHubHeaders() {
+  return {
+    'x-company-key': LIDERHUB_KEY,
+    'Content-Type':  'application/json',
+  }
+}
+
+async function cadastrarContato(numero: string, nome: string, email: string) {
+  const body: Record<string, string> = {
+    connection: LIDERHUB_CONNECTION,
+    number:     numero,
+    name:       nome,
+  }
+  if (email)          body.email = email
+  if (LIDERHUB_AGENT) body.agent = LIDERHUB_AGENT
+
+  const res = await fetch('https://api.liderhub.ai/v1/contacts', {
+    method:  'POST',
+    headers: await liderHubHeaders(),
+    body:    JSON.stringify(body),
+  })
+  return res.json() as Promise<{ exist: boolean; id?: string; created?: boolean }>
+}
+
+async function enviarMensagem(contactId: string, content: string) {
+  await fetch('https://api.liderhub.ai/v1/send/message', {
+    method:  'POST',
+    headers: await liderHubHeaders(),
+    body:    JSON.stringify({
+      contact:     contactId,
+      content,
+      messageType: 'conversation',
+    }),
+  })
+}
+
+// ── Handler principal ─────────────────────────────────────────────────────────
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
@@ -13,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const db = getAdminSupabase()
 
-    // Salva o lead no banco de dados
+    // 1. Salva o lead no banco de dados
     const { data: lead, error } = await db.from('leads').insert({
       nome,
       telefone,
@@ -27,26 +69,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (error) throw error
 
-    // Aciona IA LiderHub (quando LIDERHUB_API_KEY estiver configurado)
-    if (process.env.LIDERHUB_API_KEY && process.env.LIDERHUB_API_URL) {
-      const tel = (telefone as string).replace(/\D/g, '')
-      const waNum = tel.startsWith('55') ? tel : '55' + tel
+    // 2. Integração LiderHub (só executa se as variáveis estiverem configuradas)
+    if (LIDERHUB_KEY && LIDERHUB_CONNECTION) {
+      const tel    = (telefone as string).replace(/\D/g, '')
+      const numero = tel.startsWith('55') ? tel : '55' + tel
 
-      await fetch(process.env.LIDERHUB_API_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.LIDERHUB_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phone:    waNum,
-          name:     nome,
-          email:    email    || '',
-          situacao: situacao,
-          mensagem: mensagem || '',
-          lead_id:  lead?.id || '',
-        }),
-      })
+      // 2a. Cria/busca o contato no LiderHub
+      const contato = await cadastrarContato(numero, nome, email || '')
+
+      if (contato.exist && contato.id) {
+        // 2b. Envia mensagem de confirmação para o cliente
+        const primeiroNome = (nome as string).split(' ')[0]
+        await enviarMensagem(
+          contato.id,
+          `Olá, ${primeiroNome}! 👋\n\nRecebemos sua solicitação de análise gratuita do contracheque.\n\nNossa equipe jurídica já está avaliando o seu caso e em breve entraremos em contato.\n\n*Rogéria Oliveira Advocacia* ⚖️`
+        )
+      }
     }
 
     return res.status(200).json({ ok: true })
