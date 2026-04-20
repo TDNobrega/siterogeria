@@ -13,6 +13,13 @@ export default function Professores() {
   const [showExit, setShowExit] = useState(false)
   const [exitDismissed, setExitDismissed] = useState(false)
 
+  // Form state
+  const [formData, setFormData] = useState({ nome: '', telefone: '', email: '', situacao: '', mensagem: '' })
+  const [formFile, setFormFile] = useState<File | null>(null)
+  const [formSending, setFormSending] = useState(false)
+  const [formSent, setFormSent] = useState(false)
+  const [formError, setFormError] = useState('')
+
   useEffect(() => {
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0 && !exitDismissed) setShowExit(true)
@@ -20,6 +27,30 @@ export default function Professores() {
     document.addEventListener('mouseleave', handleMouseLeave)
     return () => document.removeEventListener('mouseleave', handleMouseLeave)
   }, [exitDismissed])
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormSending(true)
+    setFormError('')
+    const data = new FormData()
+    Object.entries(formData).forEach(([k, v]) => data.append(k, v))
+    if (formFile) data.append('contracheque', formFile)
+    data.append('_subject', 'Nova solicitação — Análise de Contracheque')
+    data.append('_captcha', 'false')
+    try {
+      const res = await fetch('https://formsubmit.co/ajax/contato@rogeriaoliveira.com', {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' },
+      })
+      if (res.ok) setFormSent(true)
+      else setFormError('Erro ao enviar. Por favor tente novamente.')
+    } catch {
+      setFormError('Erro ao enviar. Verifique sua conexão e tente novamente.')
+    } finally {
+      setFormSending(false)
+    }
+  }
 
   return (
     <>
@@ -308,20 +339,101 @@ export default function Professores() {
                 </p>
               </div>
 
-              {/* Google Forms Embed */}
-              <div className="bg-white rounded-2xl overflow-hidden shadow-xl">
-                <iframe
-                  src={GOOGLE_FORMS_URL}
-                  width="100%"
-                  height="900"
-                  frameBorder="0"
-                  marginHeight={0}
-                  marginWidth={0}
-                  title="Formulário de Análise Gratuita"
-                  className="w-full"
-                >
-                  Carregando formulário…
-                </iframe>
+              {/* Formulário Personalizado */}
+              <div className="bg-white rounded-2xl shadow-xl p-8 text-left">
+                {formSent ? (
+                  <div className="text-center py-10">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <h3 className="font-title font-bold text-ink text-2xl mb-3">Recebemos seu pedido!</h3>
+                    <p className="font-body text-muted text-base">Nossa equipe vai analisar seu contracheque e entrar em contato em até 24 horas.</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleFormSubmit}>
+                    <div className="grid sm:grid-cols-2 gap-5 mb-5">
+                      <div>
+                        <label className="block font-subtitle text-xs font-semibold text-ink mb-1.5 uppercase tracking-wide">Nome completo *</label>
+                        <input type="text" required value={formData.nome}
+                          onChange={e => setFormData({ ...formData, nome: e.target.value })}
+                          className="w-full border border-border rounded-xl px-4 py-3 font-body text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40"
+                          placeholder="Seu nome completo" />
+                      </div>
+                      <div>
+                        <label className="block font-subtitle text-xs font-semibold text-ink mb-1.5 uppercase tracking-wide">WhatsApp *</label>
+                        <input type="tel" required value={formData.telefone}
+                          onChange={e => setFormData({ ...formData, telefone: e.target.value })}
+                          className="w-full border border-border rounded-xl px-4 py-3 font-body text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40"
+                          placeholder="(21) 99999-9999" />
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-5 mb-5">
+                      <div>
+                        <label className="block font-subtitle text-xs font-semibold text-ink mb-1.5 uppercase tracking-wide">E-mail</label>
+                        <input type="email" value={formData.email}
+                          onChange={e => setFormData({ ...formData, email: e.target.value })}
+                          className="w-full border border-border rounded-xl px-4 py-3 font-body text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40"
+                          placeholder="seu@email.com" />
+                      </div>
+                      <div>
+                        <label className="block font-subtitle text-xs font-semibold text-ink mb-1.5 uppercase tracking-wide">Situação *</label>
+                        <select required value={formData.situacao}
+                          onChange={e => setFormData({ ...formData, situacao: e.target.value })}
+                          className="w-full border border-border rounded-xl px-4 py-3 font-body text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 bg-white">
+                          <option value="">Selecione...</option>
+                          <option value="Professor Ativo">Professor Ativo</option>
+                          <option value="Professor Aposentado">Professor Aposentado</option>
+                          <option value="Pensionista">Pensionista</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="mb-5">
+                      <label className="block font-subtitle text-xs font-semibold text-ink mb-1.5 uppercase tracking-wide">Contracheque (PDF ou imagem)</label>
+                      <div className="border-2 border-dashed border-border rounded-xl p-5 text-center hover:border-primary/50 transition-colors cursor-pointer">
+                        <input type="file" accept=".pdf,.jpg,.jpeg,.png" id="contracheque-upload"
+                          onChange={e => setFormFile(e.target.files?.[0] || null)}
+                          className="hidden" />
+                        <label htmlFor="contracheque-upload" className="cursor-pointer block">
+                          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
+                            <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                          </div>
+                          {formFile ? (
+                            <p className="font-subtitle text-sm text-primary font-semibold">{formFile.name}</p>
+                          ) : (
+                            <>
+                              <p className="font-subtitle text-sm text-ink font-semibold">Clique para anexar seu contracheque</p>
+                              <p className="font-body text-xs text-muted mt-1">PDF, JPG ou PNG · até 5MB</p>
+                            </>
+                          )}
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="mb-6">
+                      <label className="block font-subtitle text-xs font-semibold text-ink mb-1.5 uppercase tracking-wide">Descreva sua situação (opcional)</label>
+                      <textarea rows={3} value={formData.mensagem}
+                        onChange={e => setFormData({ ...formData, mensagem: e.target.value })}
+                        className="w-full border border-border rounded-xl px-4 py-3 font-body text-sm text-ink focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
+                        placeholder="Ex: Sou professora há 15 anos e acredito que meu triênio não está sendo calculado corretamente..." />
+                    </div>
+
+                    {formError && (
+                      <p className="text-red-500 text-sm mb-4 font-subtitle">{formError}</p>
+                    )}
+
+                    <button type="submit" disabled={formSending}
+                      className="w-full bg-primary hover:bg-support text-white font-subtitle font-bold
+                                 py-4 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-base">
+                      {formSending ? 'Enviando...' : 'QUERO MINHA ANÁLISE GRATUITA'}
+                    </button>
+                  </form>
+                )}
               </div>
 
               <div className="flex items-center justify-center gap-2 mt-6">
@@ -387,34 +499,6 @@ export default function Professores() {
                 ))}
               </div>
 
-              {/* Depoimento destaque */}
-              <div className="bg-[#F8F4EA] rounded-2xl border border-secondary/30 p-8 text-center max-w-2xl mx-auto">
-                <svg className="w-8 h-8 text-primary mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                </svg>
-                <p className="font-body text-muted text-base leading-relaxed italic mb-6">
-                  "Eu não sabia que recebia R$ 800 a menos por mês por causa da Nova Escola.
-                  O escritório identificou o erro e em 8 meses recebi tudo retroativo. Só lamento
-                  não ter procurado antes."
-                </p>
-                <div className="flex items-center justify-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary flex items-center
-                                  justify-center text-white font-bold text-sm flex-shrink-0">
-                    A
-                  </div>
-                  <div className="text-left">
-                    <p className="font-subtitle font-semibold text-ink text-sm">Ana Paula R.</p>
-                    <p className="font-body text-muted text-xs">Professora Estadual — Rio de Janeiro</p>
-                  </div>
-                  <div className="flex gap-0.5 ml-2">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-                </div>
-              </div>
             </div>
           </section>
 
