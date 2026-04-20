@@ -349,7 +349,7 @@ export default function Professores() {
                 </h2>
                 <p className="font-body text-white/70 text-base max-w-xl mx-auto">
                   Preencha o formulário abaixo. Nossa equipe analisa seu caso e entra
-                  em contato em até 24 horas.
+                  em contato em breve.
                 </p>
               </div>
 
@@ -363,7 +363,7 @@ export default function Professores() {
                       </svg>
                     </div>
                     <h3 className="font-title font-bold text-ink text-2xl mb-3">Recebemos seu pedido!</h3>
-                    <p className="font-body text-muted text-base">Nossa equipe vai analisar seu contracheque e entrar em contato em até 24 horas.</p>
+                    <p className="font-body text-muted text-base">Avaliamos seu caso e entraremos em contato em breve.</p>
                   </div>
                 ) : (
                   <form onSubmit={handleFormSubmit}>
