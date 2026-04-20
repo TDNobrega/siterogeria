@@ -4,7 +4,7 @@ import { getAdminSupabase } from '../../lib/supabase'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const { nome, telefone, email, situacao, mensagem, arquivo_nome, arquivo_url } = req.body
+  const { nome, telefone, email, situacao, mensagem, arquivo_nome, arquivo_path } = req.body
 
   if (!nome || !telefone || !situacao) {
     return res.status(400).json({ error: 'Campos obrigatórios faltando.' })
@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       situacao,
       mensagem:     mensagem     || null,
       arquivo_nome: arquivo_nome || null,
-      arquivo_url:  arquivo_url  || null,
+      arquivo_path: arquivo_path || null,
       status: 'novo',
     }).select().single()
 

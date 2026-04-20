@@ -14,7 +14,7 @@ type Lead = {
   situacao: string
   mensagem: string | null
   arquivo_nome: string | null
-  arquivo_url: string | null
+  arquivo_path: string | null
   status: 'novo' | 'em_contato' | 'cliente' | 'arquivado'
 }
 
@@ -314,8 +314,9 @@ function Dashboard({ leads: initial }: { leads: Lead[] }) {
 
                     {/* Arquivo */}
                     <td className="px-5 py-4">
-                      {lead.arquivo_url ? (
-                        <a href={lead.arquivo_url} target="_blank" rel="noopener noreferrer"
+                      {lead.arquivo_path ? (
+                        <a href={`/api/admin/file-url?path=${encodeURIComponent(lead.arquivo_path)}`}
+                          target="_blank" rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 font-subtitle text-xs
                                      text-primary hover:underline font-semibold">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -394,8 +395,9 @@ function Dashboard({ leads: initial }: { leads: Lead[] }) {
                   <span className="font-subtitle text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-semibold">
                     {lead.situacao}
                   </span>
-                  {lead.arquivo_url && (
-                    <a href={lead.arquivo_url} target="_blank" rel="noopener noreferrer"
+                  {lead.arquivo_path && (
+                    <a href={`/api/admin/file-url?path=${encodeURIComponent(lead.arquivo_path)}`}
+                      target="_blank" rel="noopener noreferrer"
                       className="font-subtitle text-xs text-primary font-semibold hover:underline">
                       📎 Contracheque
                     </a>

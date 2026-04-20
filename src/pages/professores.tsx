@@ -31,9 +31,9 @@ export default function Professores() {
 
     try {
       let arquivo_nome: string | null = null
-      let arquivo_url:  string | null = null
+      let arquivo_path: string | null = null
 
-      // 1. Upload do contracheque para o Supabase Storage (se houver arquivo)
+      // 1. Upload do contracheque para o Supabase Storage (bucket privado)
       if (formFile) {
         const ext      = formFile.name.split('.').pop()
         const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
@@ -44,16 +44,13 @@ export default function Professores() {
         if (uploadErr) throw uploadErr
 
         arquivo_nome = formFile.name
-        const { data: urlData } = supabase.storage
-          .from('contracheques')
-          .getPublicUrl(upload.path)
-        arquivo_url = urlData.publicUrl
+        arquivo_path = upload.path   // apenas o caminho — sem URL pública
       }
 
       // 2. Salva lead no banco de dados via API
       const res = await fetch('/api/submit-lead', {
         method: 'POST',
-        body: JSON.stringify({ ...formData, arquivo_nome, arquivo_url }),
+        body: JSON.stringify({ ...formData, arquivo_nome, arquivo_path }),
         headers: { 'Content-Type': 'application/json' },
       })
 
