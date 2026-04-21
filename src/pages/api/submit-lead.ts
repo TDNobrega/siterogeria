@@ -24,7 +24,7 @@ async function cadastrarContato(numero: string, nome: string, email: string) {
 
   console.log('LiderHub request body:', JSON.stringify(body))
 
-  const res = await fetch('https://api.liderhub.ai/v1/contacts', {
+  const res = await fetch('https://chat.liderhub.ai/v1/contacts', {
     method:  'POST',
     headers: await liderHubHeaders(),
     body:    JSON.stringify(body),
@@ -38,7 +38,7 @@ async function cadastrarContato(numero: string, nome: string, email: string) {
 }
 
 async function enviarMensagem(contactId: string, content: string) {
-  await fetch('https://api.liderhub.ai/v1/send/message', {
+  await fetch('https://chat.liderhub.ai/v1/send/message', {
     method:  'POST',
     headers: await liderHubHeaders(),
     body:    JSON.stringify({
