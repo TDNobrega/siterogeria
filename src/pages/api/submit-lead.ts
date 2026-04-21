@@ -69,21 +69,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (error) throw error
 
-    // 2. Integração LiderHub (só executa se as variáveis estiverem configuradas)
+    // 2. Integração LiderHub (erro aqui não bloqueia a resposta)
     if (LIDERHUB_KEY && LIDERHUB_CONNECTION) {
-      const tel    = (telefone as string).replace(/\D/g, '')
-      const numero = tel.startsWith('55') ? tel : '55' + tel
+      try {
+        const tel    = (telefone as string).replace(/\D/g, '')
+        const numero = tel.startsWith('55') ? tel : '55' + tel
 
-      // 2a. Cria/busca o contato no LiderHub
-      const contato = await cadastrarContato(numero, nome, email || '')
+        const contato = await cadastrarContato(numero, nome, email || '')
+        console.log('LiderHub contato:', JSON.stringify(contato))
 
-      if (contato.exist && contato.id) {
-        // 2b. Envia mensagem de confirmação para o cliente
-        const primeiroNome = (nome as string).split(' ')[0]
-        await enviarMensagem(
-          contato.id,
-          `Olá, ${primeiroNome}! 👋\n\nRecebemos sua solicitação de análise gratuita do contracheque.\n\nNossa equipe jurídica já está avaliando o seu caso e em breve entraremos em contato.\n\n*Rogéria Oliveira Advocacia* ⚖️`
-        )
+        const contactId = contato.id
+        if (contactId) {
+          const primeiroNome = (nome as string).split(' ')[0]
+          await enviarMensagem(
+            contactId,
+            `Olá, ${primeiroNome}! 👋\n\nRecebemos sua solicitação de análise gratuita do contracheque.\n\nNossa equipe jurídica já está avaliando o seu caso e em breve entraremos em contato.\n\n*Rogéria Oliveira Advocacia* ⚖️`
+          )
+        }
+      } catch (liderErr) {
+        console.error('LiderHub error (non-fatal):', liderErr)
       }
     }
 
