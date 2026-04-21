@@ -22,12 +22,19 @@ async function cadastrarContato(numero: string, nome: string, email: string) {
   if (email)          body.email = email
   if (LIDERHUB_AGENT) body.agent = LIDERHUB_AGENT
 
+  console.log('LiderHub request body:', JSON.stringify(body))
+
   const res = await fetch('https://api.liderhub.ai/v1/contacts', {
     method:  'POST',
     headers: await liderHubHeaders(),
     body:    JSON.stringify(body),
   })
-  return res.json() as Promise<{ exist: boolean; id?: string; created?: boolean }>
+
+  const rawText = await res.text()
+  console.log('LiderHub status:', res.status)
+  console.log('LiderHub raw response:', rawText)
+
+  return JSON.parse(rawText) as { exist: boolean; id?: string; created?: boolean }
 }
 
 async function enviarMensagem(contactId: string, content: string) {
