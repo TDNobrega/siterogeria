@@ -53,14 +53,46 @@ async function enviarMensagem(contactId: string, content: string) {
   })
 }
 
+// ── Extensões permitidas para upload ─────────────────────────────────────────
+const EXTENSOES_PERMITIDAS = ['.pdf', '.jpg', '.jpeg', '.png', '.webp']
+const TAMANHO_MAX_NOME     = 200
+
 // ── Handler principal ─────────────────────────────────────────────────────────
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
   const { nome, telefone, email, situacao, mensagem, arquivo_nome, arquivo_path } = req.body
 
+  // Validação de campos obrigatórios
   if (!nome || !telefone || !situacao) {
     return res.status(400).json({ error: 'Campos obrigatórios faltando.' })
+  }
+
+  // Sanitização básica — limita tamanho dos campos de texto
+  if (
+    String(nome).length     > 200 ||
+    String(telefone).length > 20  ||
+    String(situacao).length > 100 ||
+    (email    && String(email).length    > 200) ||
+    (mensagem && String(mensagem).length > 2000)
+  ) {
+    return res.status(400).json({ error: 'Dados inválidos.' })
+  }
+
+  // Validação do arquivo (se enviado)
+  if (arquivo_nome) {
+    const ext = String(arquivo_nome).toLowerCase().slice(String(arquivo_nome).lastIndexOf('.'))
+    if (
+      String(arquivo_nome).length > TAMANHO_MAX_NOME ||
+      !EXTENSOES_PERMITIDAS.includes(ext)
+    ) {
+      return res.status(400).json({ error: 'Tipo de arquivo não permitido.' })
+    }
+  }
+
+  // Valida que arquivo_path não contém traversal
+  if (arquivo_path && (String(arquivo_path).includes('..') || String(arquivo_path).includes('//'))) {
+    return res.status(400).json({ error: 'Caminho de arquivo inválido.' })
   }
 
   try {
