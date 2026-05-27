@@ -2,12 +2,15 @@
 // SISTEMA ROGÉRIA — Legal Ops
 // Google Apps Script — Código.gs
 // Captura e tratamento de documentos para escritório de advocacia
+// Canal 1: Email (documentos@rogeriaoliveira.com)
+// Canal 2: WhatsApp via LiderHub API (múltiplos workspaces)
 // ============================================================
 
 // ---- CONSTANTES GERAIS ----
-var PASTA_NOME   = 'ARQUIVOS CLIENTES / EMAIL E LIDERHUB';
-var QUERY_EMAIL  = 'to:documentos@rogeriaoliveira.com has:attachment is:unread';
-var GEMINI_MODEL = 'gemini-2.5-flash';
+var PASTA_NOME        = 'ARQUIVOS CLIENTES / EMAIL E LIDERHUB';
+var QUERY_EMAIL       = 'to:documentos@rogeriaoliveira.com has:attachment is:unread';
+var GEMINI_MODEL      = 'gemini-2.5-flash';
+var LIDERHUB_BASE_URL = 'https://api.liderhub.com.br';
 
 // ---- TIPOS DE DOCUMENTO RECONHECIDOS ----
 var TIPOS_DOCUMENTO = [
@@ -699,4 +702,335 @@ function testarComImagem() {
     Logger.log('ERRO no teste com imagem: ' + e.message);
     Logger.log('Stack: ' + e.stack);
   }
+}
+
+// ============================================================
+// ============================================================
+// CANAL 2 — WHATSAPP VIA LIDERHUB API
+// ============================================================
+// ============================================================
+
+// ============================================================
+// INSTALAR TRIGGER LIDERHUB — executa verificarLiderHub a cada 15 minutos
+// Rodar UMA VEZ manualmente no Apps Script Editor
+// ============================================================
+function instalarTriggerLiderHub() {
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'verificarLiderHub') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+  ScriptApp.newTrigger('verificarLiderHub')
+    .timeBased()
+    .everyMinutes(15)
+    .create();
+  Logger.log('Trigger instalado: verificarLiderHub a cada 15 minutos.');
+}
+
+// ============================================================
+// VERIFICAR LIDERHUB — ponto de entrada do canal WhatsApp
+// Lê LIDERHUB_WORKSPACES das Script Properties (JSON array)
+// ============================================================
+function verificarLiderHub() {
+  Logger.log('=== verificarLiderHub iniciado ===');
+
+  var props = PropertiesService.getScriptProperties();
+  var workspacesJson = props.getProperty('LIDERHUB_WORKSPACES');
+
+  if (!workspacesJson) {
+    Logger.log('LIDERHUB_WORKSPACES não configurado — ignorando canal WhatsApp.');
+    return;
+  }
+
+  var workspaces;
+  try {
+    workspaces = JSON.parse(workspacesJson);
+  } catch (e) {
+    Logger.log('ERRO ao parsear LIDERHUB_WORKSPACES: ' + e.message);
+    return;
+  }
+
+  for (var i = 0; i < workspaces.length; i++) {
+    try {
+      processarWorkspace(workspaces[i]);
+    } catch (e) {
+      Logger.log('ERRO no workspace "' + workspaces[i].nome + '": ' + e.message);
+    }
+  }
+
+  Logger.log('=== verificarLiderHub concluído ===');
+}
+
+// ============================================================
+// PROCESSAR WORKSPACE — um workspace por execução
+// ============================================================
+function processarWorkspace(workspace) {
+  Logger.log('--- Workspace: ' + workspace.nome + ' ---');
+
+  var props      = PropertiesService.getScriptProperties();
+  var lastRunKey = 'LIDERHUB_LAST_RUN_' + workspace.id;
+  var lastRun    = props.getProperty(lastRunKey);
+
+  // Na primeira execução, olha para a última hora
+  if (!lastRun) {
+    lastRun = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    Logger.log('Primeira execução — usando janela de 1h: ' + lastRun);
+  }
+
+  var novaUltimaRun = new Date().toISOString();
+  var contatos      = buscarContatosRecentes(workspace, lastRun);
+  Logger.log('Contatos com atividade recente: ' + contatos.length);
+
+  var totalDocs = 0;
+
+  for (var i = 0; i < contatos.length; i++) {
+    var contato     = contatos[i];
+    var nomeContato = contato.contactName
+      ? contato.contactName.trim()
+      : (contato.contactNumber || 'Contato Desconhecido');
+
+    var mensagens = buscarMensagensMidia(workspace, contato.id, lastRun);
+
+    for (var j = 0; j < mensagens.length; j++) {
+      try {
+        processarMensagemMidia(mensagens[j], nomeContato, workspace);
+        totalDocs++;
+      } catch (e) {
+        Logger.log('ERRO na mensagem ' + mensagens[j].id + ': ' + e.message);
+      }
+      Utilities.sleep(400); // respeita rate limit 3 req/s
+    }
+  }
+
+  Logger.log('Workspace "' + workspace.nome + '" — docs processados: ' + totalDocs);
+  props.setProperty(lastRunKey, novaUltimaRun);
+}
+
+// ============================================================
+// BUSCAR CONTATOS RECENTES — modifiedAfter = última execução
+// ============================================================
+function buscarContatosRecentes(workspace, modifiedAfter) {
+  var todos = [];
+  var page  = 1;
+
+  do {
+    var url = LIDERHUB_BASE_URL + '/v1/contacts'
+      + '?limit=100'
+      + '&page=' + page
+      + '&modifiedAfter=' + encodeURIComponent(modifiedAfter);
+
+    var resp = UrlFetchApp.fetch(url, {
+      method: 'get',
+      headers: { 'x-company-key': workspace.key },
+      muteHttpExceptions: true
+    });
+
+    if (resp.getResponseCode() !== 200) {
+      Logger.log('ERRO GET /v1/contacts HTTP ' + resp.getResponseCode() + ': ' + resp.getContentText());
+      break;
+    }
+
+    var json = JSON.parse(resp.getContentText());
+    if (!json.contacts || json.contacts.length === 0) break;
+
+    todos = todos.concat(json.contacts);
+
+    if (!json.pagination || !json.pagination.hasNextPage) break;
+    page++;
+    Utilities.sleep(400);
+
+  } while (true);
+
+  return todos;
+}
+
+// ============================================================
+// BUSCAR MENSAGENS COM MÍDIA — filtra por timestamp e outbound=false
+// ============================================================
+function buscarMensagensMidia(workspace, contactId, apos) {
+  var url = LIDERHUB_BASE_URL + '/v1/message'
+    + '?contact=' + contactId
+    + '&limit=50&page=1';
+
+  var resp = UrlFetchApp.fetch(url, {
+    method: 'get',
+    headers: { 'x-company-key': workspace.key },
+    muteHttpExceptions: true
+  });
+
+  if (resp.getResponseCode() !== 200) {
+    Logger.log('ERRO GET /v1/message HTTP ' + resp.getResponseCode());
+    return [];
+  }
+
+  var json     = JSON.parse(resp.getContentText());
+  var mensagens = json.messages || [];
+  var limite   = new Date(apos).getTime();
+  var comMidia = [];
+
+  for (var i = 0; i < mensagens.length; i++) {
+    var msg = mensagens[i];
+
+    if (msg.outbound)                          continue; // ignorar mensagens enviadas pelo escritório
+    if (!msg.mediaUrl || msg.mediaUrl === '')  continue; // sem mídia
+    if (msg.type === 'conversation')           continue; // texto puro
+    if (new Date(msg.createdAt).getTime() <= limite) continue; // já processada
+
+    comMidia.push(msg);
+  }
+
+  return comMidia;
+}
+
+// ============================================================
+// PROCESSAR MENSAGEM COM MÍDIA — baixa e envia ao pipeline
+// ============================================================
+function processarMensagemMidia(msg, nomeContato, workspace) {
+  Logger.log('[LiderHub] Baixando: ' + msg.type + ' | ' + msg.mediaUrl);
+
+  // Tenta baixar sem autenticação primeiro (URL pública da mídia)
+  var resp = UrlFetchApp.fetch(msg.mediaUrl, {
+    muteHttpExceptions: true,
+    followRedirects: true
+  });
+
+  // Se exigir autenticação, tenta com a chave do workspace
+  if (resp.getResponseCode() === 401 || resp.getResponseCode() === 403) {
+    resp = UrlFetchApp.fetch(msg.mediaUrl, {
+      headers: { 'x-company-key': workspace.key },
+      muteHttpExceptions: true,
+      followRedirects: true
+    });
+  }
+
+  if (resp.getResponseCode() !== 200) {
+    throw new Error('Falha ao baixar mídia: HTTP ' + resp.getResponseCode());
+  }
+
+  var blob     = resp.getBlob();
+  var mimeType = blob.getContentType() || inferirMimeType(msg.type);
+  blob.setContentType(mimeType);
+
+  // Nome do arquivo baseado no tipo e timestamp
+  var ext      = mimeType.split('/')[1] || 'bin';
+  var nomeFinal = msg.type + '_' + new Date(msg.createdAt).getTime() + '.' + ext;
+  blob.setName(nomeFinal);
+
+  // Mock de anexo compatível com o pipeline existente
+  var blobFinal = blob;
+  var anexoMock = {
+    getName:        function() { return nomeFinal; },
+    getContentType: function() { return mimeType; },
+    copyBlob:       function() { return blobFinal; },
+    getBytes:       function() { return blobFinal.getBytes(); }
+  };
+
+  tratarDocumentoWorkspace(anexoMock, nomeContato, 'WhatsApp: ' + nomeContato, workspace.pasta);
+}
+
+// ============================================================
+// INFERIR MIME TYPE — fallback quando Content-Type ausente
+// ============================================================
+function inferirMimeType(tipo) {
+  var mapa = {
+    'image':    'image/jpeg',
+    'video':    'video/mp4',
+    'audio':    'audio/ogg',
+    'document': 'application/pdf'
+  };
+  return mapa[tipo] || 'application/octet-stream';
+}
+
+// ============================================================
+// TRATAR DOCUMENTO WORKSPACE — pipeline completo com pasta de workspace
+// ============================================================
+function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaWorkspace) {
+  var nomeOriginal = anexo.getName();
+  var mimeType     = anexo.getContentType();
+  Logger.log('[LiderHub] Tratando: ' + nomeOriginal + ' (' + mimeType + ')');
+
+  var nomeFinal, blob, tipo;
+
+  if (mimeType === 'application/pdf') {
+    tipo      = identificarTipoPorNome(nomeOriginal);
+    nomeFinal = tipo + '.pdf';
+    blob      = anexo.copyBlob().setName(nomeFinal);
+
+  } else if (mimeType.indexOf('image/') === 0) {
+    var resultado = tratarNoCloudinary(anexo, nomeOriginal, mimeType);
+    tipo          = resultado.tipo;
+    blob          = converterParaPdf(resultado.blob, tipo);
+    nomeFinal     = tipo + '.pdf';
+
+  } else {
+    tipo      = 'Documento';
+    nomeFinal = 'Documento_' + nomeOriginal;
+    blob      = anexo.copyBlob().setName(nomeFinal);
+  }
+
+  var arquivo = salvarNoDriveWorkspace(blob, nomeCliente, pastaWorkspace);
+  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente);
+  Logger.log('[LiderHub] Salvo: ' + arquivo.getName() + ' | ' + arquivo.getUrl());
+}
+
+// ============================================================
+// SALVAR NO DRIVE WORKSPACE — hierarquia: PASTA_NOME / workspace / cliente
+// ============================================================
+function salvarNoDriveWorkspace(blob, nomeCliente, pastaWorkspace) {
+  var iter    = DriveApp.getFoldersByName(PASTA_NOME);
+  var raiz    = iter.hasNext() ? iter.next() : DriveApp.createFolder(PASTA_NOME);
+
+  var wsIter  = raiz.getFoldersByName(pastaWorkspace);
+  var pastaWs = wsIter.hasNext() ? wsIter.next() : raiz.createFolder(pastaWorkspace);
+
+  var cliIter  = pastaWs.getFoldersByName(nomeCliente);
+  var pastaCli = cliIter.hasNext() ? cliIter.next() : pastaWs.createFolder(nomeCliente);
+
+  var arquivo = pastaCli.createFile(blob);
+  Logger.log('[LiderHub] Drive: ' + pastaWorkspace + '/' + nomeCliente + '/' + arquivo.getName());
+  return arquivo;
+}
+
+// ============================================================
+// TESTAR LIDERHUB — verifica conectividade e lista contatos recentes
+// Rodar manualmente para validar chaves antes de ativar o trigger
+// ============================================================
+function testarLiderHub() {
+  Logger.log('=== Teste LiderHub ===');
+
+  var props          = PropertiesService.getScriptProperties();
+  var workspacesJson = props.getProperty('LIDERHUB_WORKSPACES');
+
+  if (!workspacesJson) {
+    Logger.log('❌ LIDERHUB_WORKSPACES não configurado nas Script Properties.');
+    return;
+  }
+
+  var workspaces = JSON.parse(workspacesJson);
+  Logger.log('Workspaces configurados: ' + workspaces.length);
+
+  for (var i = 0; i < workspaces.length; i++) {
+    var ws  = workspaces[i];
+    var url = LIDERHUB_BASE_URL + '/v1/contacts?limit=5&page=1';
+
+    Logger.log('--- Testando: ' + ws.nome + ' ---');
+
+    var resp = UrlFetchApp.fetch(url, {
+      method: 'get',
+      headers: { 'x-company-key': ws.key },
+      muteHttpExceptions: true
+    });
+
+    if (resp.getResponseCode() === 200) {
+      var json = JSON.parse(resp.getContentText());
+      Logger.log('✅ ' + ws.nome + ' OK — total contatos: ' + (json.pagination ? json.pagination.total : '?'));
+    } else {
+      Logger.log('❌ ' + ws.nome + ' ERRO HTTP ' + resp.getResponseCode() + ': ' + resp.getContentText());
+    }
+
+    Utilities.sleep(500);
+  }
+
+  Logger.log('=== Teste LiderHub concluído ===');
 }
