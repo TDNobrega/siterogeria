@@ -818,7 +818,8 @@ function buscarContatosRecentes(workspace, modifiedAfter) {
     var url = LIDERHUB_BASE_URL + '/v1/contacts'
       + '?limit=100'
       + '&page=' + page
-      + '&modifiedAfter=' + encodeURIComponent(modifiedAfter);
+      + '&modifiedAfter=' + encodeURIComponent(modifiedAfter)
+      + (workspace.tagId ? '&tags=' + encodeURIComponent(workspace.tagId) : '');
 
     var resp = UrlFetchApp.fetch(url, {
       method: 'get',
@@ -990,6 +991,186 @@ function salvarNoDriveWorkspace(blob, nomeCliente, pastaWorkspace) {
   var arquivo = pastaCli.createFile(blob);
   Logger.log('[LiderHub] Drive: ' + pastaWorkspace + '/' + nomeCliente + '/' + arquivo.getName());
   return arquivo;
+}
+
+// ============================================================
+// WEB APP — página de acionamento manual para o comercial
+// Deploy: Implantar > Novo deployment > Web App
+//   Executar como: Eu  |  Acesso: Qualquer pessoa
+// ============================================================
+function doGet() {
+  var html =
+    '<!DOCTYPE html><html><head>' +
+    '<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>Documentos Históricos</title>' +
+    '<style>' +
+    'body{font-family:sans-serif;max-width:460px;margin:60px auto;padding:0 20px;color:#333}' +
+    'h2{font-size:1.15rem;margin-bottom:6px}' +
+    'p{font-size:.88rem;color:#666;margin-bottom:24px}' +
+    'button{background:#1a73e8;color:#fff;border:none;padding:13px 0;border-radius:6px;' +
+    'font-size:1rem;cursor:pointer;width:100%}' +
+    'button:disabled{background:#aaa;cursor:not-allowed}' +
+    '#st{margin-top:18px;font-size:.88rem;padding:12px;border-radius:6px;display:none}' +
+    '.run{background:#e8f0fe;color:#1a73e8}' +
+    '.ok{background:#e6f4ea;color:#137333}' +
+    '.err{background:#fce8e6;color:#c5221f}' +
+    '</style></head><body>' +
+    '<h2>Baixar Documentos Históricos</h2>' +
+    '<p>Baixa todos os arquivos das conversas marcadas com a tag <strong>salvar-documentos</strong> no LiderHub.</p>' +
+    '<button id="btn" onclick="run()">Iniciar Download</button>' +
+    '<div id="st"></div>' +
+    '<script>' +
+    'function run(){' +
+    '  var b=document.getElementById("btn"),s=document.getElementById("st");' +
+    '  b.disabled=true;b.textContent="Processando...";' +
+    '  s.className="run";s.style.display="block";s.textContent="Buscando documentos... pode levar alguns minutos.";' +
+    '  google.script.run' +
+    '    .withSuccessHandler(function(r){b.disabled=false;b.textContent="Iniciar Download";s.className="ok";s.textContent=r;})' +
+    '    .withFailureHandler(function(e){b.disabled=false;b.textContent="Iniciar Download";s.className="err";s.textContent="Erro: "+e.message;})' +
+    '    .baixarDocumentosHistoricos();' +
+    '}' +
+    '</script></body></html>';
+  return HtmlService.createHtmlOutput(html).setTitle('Documentos Históricos');
+}
+
+// ============================================================
+// BAIXAR DOCUMENTOS HISTÓRICOS — ponto de entrada da Web App
+// Sem filtro de data — processa tudo que tiver a tag salvar-documentos
+// ============================================================
+function baixarDocumentosHistoricos() {
+  var props = PropertiesService.getScriptProperties();
+  var workspacesJson = props.getProperty('LIDERHUB_WORKSPACES');
+
+  if (!workspacesJson) throw new Error('LIDERHUB_WORKSPACES não configurado.');
+
+  var workspaces;
+  try {
+    workspaces = JSON.parse(workspacesJson);
+  } catch (e) {
+    throw new Error('LIDERHUB_WORKSPACES inválido: ' + e.message);
+  }
+
+  var totalDocs = 0;
+
+  for (var i = 0; i < workspaces.length; i++) {
+    var ws = workspaces[i];
+    if (!ws.tagId) {
+      Logger.log('Workspace "' + ws.nome + '" sem tagId — ignorado.');
+      continue;
+    }
+    try {
+      totalDocs += baixarHistoricoWorkspace(ws);
+    } catch (e) {
+      Logger.log('ERRO workspace "' + ws.nome + '": ' + e.message);
+    }
+  }
+
+  var msg = 'Concluído. ' + totalDocs + ' documento(s) processado(s).';
+  Logger.log(msg);
+  return msg;
+}
+
+// ============================================================
+// BAIXAR HISTÓRICO DE UM WORKSPACE
+// ============================================================
+function baixarHistoricoWorkspace(workspace) {
+  Logger.log('=== Histórico: ' + workspace.nome + ' ===');
+
+  var contatos  = buscarContatosComTag(workspace);
+  var totalDocs = 0;
+
+  Logger.log('Contatos tagados: ' + contatos.length);
+
+  for (var i = 0; i < contatos.length; i++) {
+    var contato     = contatos[i];
+    var nomeContato = contato.contactName
+      ? contato.contactName.trim()
+      : (contato.contactNumber || 'Contato Desconhecido');
+
+    var mensagens = buscarTodasMensagensMidia(workspace, contato.id);
+
+    for (var j = 0; j < mensagens.length; j++) {
+      try {
+        processarMensagemMidia(mensagens[j], nomeContato, workspace);
+        totalDocs++;
+      } catch (e) {
+        Logger.log('ERRO mensagem ' + mensagens[j].id + ': ' + e.message);
+      }
+      Utilities.sleep(400);
+    }
+  }
+
+  Logger.log('Histórico "' + workspace.nome + '" — docs: ' + totalDocs);
+  return totalDocs;
+}
+
+// ============================================================
+// BUSCAR CONTATOS COM TAG — sem filtro de data
+// ============================================================
+function buscarContatosComTag(workspace) {
+  var todos = [];
+  var page  = 1;
+
+  do {
+    var url = LIDERHUB_BASE_URL + '/v1/contacts'
+      + '?limit=100'
+      + '&page=' + page
+      + '&tags=' + encodeURIComponent(workspace.tagId);
+
+    var resp = UrlFetchApp.fetch(url, {
+      method:           'get',
+      headers:          { 'x-company-key': workspace.key },
+      muteHttpExceptions: true
+    });
+
+    if (resp.getResponseCode() !== 200) {
+      Logger.log('ERRO GET /v1/contacts HTTP ' + resp.getResponseCode());
+      break;
+    }
+
+    var json = JSON.parse(resp.getContentText());
+    if (!json.contacts || json.contacts.length === 0) break;
+
+    todos = todos.concat(json.contacts);
+
+    if (!json.pagination || !json.pagination.hasNextPage) break;
+    page++;
+    Utilities.sleep(400);
+
+  } while (true);
+
+  return todos;
+}
+
+// ============================================================
+// BUSCAR TODAS AS MENSAGENS COM MÍDIA — sem filtro de data
+// ============================================================
+function buscarTodasMensagensMidia(workspace, contactId) {
+  var url = LIDERHUB_BASE_URL + '/v1/message'
+    + '?contact=' + contactId
+    + '&limit=50&page=1';
+
+  var resp = UrlFetchApp.fetch(url, {
+    method:           'get',
+    headers:          { 'x-company-key': workspace.key },
+    muteHttpExceptions: true
+  });
+
+  if (resp.getResponseCode() !== 200) return [];
+
+  var json      = JSON.parse(resp.getContentText());
+  var mensagens = json.messages || json.data || [];
+  var comMidia  = [];
+
+  for (var i = 0; i < mensagens.length; i++) {
+    var msg = mensagens[i];
+    if (msg.outbound)                         continue;
+    if (!msg.mediaUrl || msg.mediaUrl === '') continue;
+    if (msg.type === 'conversation')          continue;
+    comMidia.push(msg);
+  }
+
+  return comMidia;
 }
 
 // ============================================================
