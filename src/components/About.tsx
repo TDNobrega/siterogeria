@@ -4,14 +4,14 @@ const stats = [
   { value: '10+',  label: 'Anos de Experiência' },
   { value: '500+', label: 'Casos Resolvidos' },
   { value: '98%',  label: 'Clientes Satisfeitos' },
-  { value: '2',    label: 'Especialidades' },
+  { value: '3',    label: 'Especialidades' },
 ]
 
 const values = [
   { icon: '⚖️', title: 'Ética Profissional',  desc: 'Transparência em cada etapa' },
   { icon: '🎯', title: 'Foco em Resultados',   desc: 'Estratégias orientadas ao sucesso' },
   { icon: '🤝', title: 'Atendimento Humano',   desc: 'Você não é apenas um processo' },
-  { icon: '📚', title: 'Especialização Real',  desc: 'Anos dedicados ao direito do professor' },
+  { icon: '📚', title: 'Especialização Real',  desc: 'Anos dedicados ao direito público e trabalhista' },
 ]
 
 export default function About() {
@@ -74,21 +74,20 @@ export default function About() {
 
             <div className="space-y-4 font-body text-muted text-base leading-relaxed">
               <p>
-                Somos um escritório especializado no atendimento a{' '}
-                <strong className="text-ink font-semibold">professores</strong> e
-                trabalhadores com questões junto ao{' '}
-                <strong className="text-ink font-semibold">INSS</strong>, com
-                atuação em todo o Brasil.
+                Somos um escritório de advocacia com atuação nacional, especializado
+                nas complexidades que envolvem o{' '}
+                <strong className="text-ink font-semibold">Servidor Público</strong> e o{' '}
+                <strong className="text-ink font-semibold">Trabalhador da iniciativa privada</strong>.
+                Nossa missão é clara: garantir que cada cliente receba uma defesa personalizada,
+                transparente e rigorosamente focada em resultados.
               </p>
               <p>
-                Nossa missão é garantir que cada cliente receba atendimento
-                personalizado, transparente e focado em resultados. Entendemos as
-                particularidades da carreira docente e as complexidades do sistema
-                previdenciário brasileiro.
-              </p>
-              <p>
-                Já ajudamos centenas de professores a recuperarem descontos indevidos,
-                garantirem seus benefícios e conquistarem a aposentadoria a que têm direito.
+                Com uma trajetória sólida em{' '}
+                <strong className="text-ink font-semibold">Direito Previdenciário (RPPS e RGPS)</strong> e{' '}
+                <strong className="text-ink font-semibold">Trabalhista</strong>, dominamos as nuances
+                que separam um benefício negado de uma aposentadoria justa. Seja na recuperação de
+                descontos indevidos, na correção de injustiças contratuais ou na viabilização de
+                benefícios junto ao INSS, estamos prontos para proteger o seu patrimônio e o seu futuro.
               </p>
             </div>
 

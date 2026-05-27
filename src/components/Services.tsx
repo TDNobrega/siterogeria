@@ -4,25 +4,25 @@ const services = [
   {
     id: 'professores',
     icon: '🎓',
-    title: 'Direito dos Professores',
-    subtitle: 'Defesa dos seus direitos trabalhistas como docente',
+    title: 'Direito dos Servidores Públicos',
+    subtitle: 'Defesa dos seus direitos como servidor ou docente',
     items: [
       'Descontos indevidos no contracheque',
       'Licenças médicas e afastamentos',
-      'Horas-aula e regência de classe',
+      'Piso Nacional do Magistério e triênios',
       'Progressão funcional bloqueada',
       'Demissão irregular ou assédio',
       'Revisão salarial e adicional de qualificação',
-      'Direitos de professores municipais, estaduais e federais',
+      'Direitos de servidores municipais, estaduais e federais',
     ],
   },
   {
     id: 'previdenciario',
     icon: '🏛️',
     title: 'Direito Previdenciário',
-    subtitle: 'INSS, aposentadoria, benefícios e BPC/LOAS',
+    subtitle: 'RPPS, RGPS, aposentadoria, benefícios e BPC/LOAS',
     items: [
-      'Aposentadoria por tempo de contribuição',
+      'Aposentadoria por tempo de contribuição (RPPS e RGPS)',
       'Aposentadoria por invalidez',
       'Revisão de benefícios negados',
       'Auxílio-doença e auxílio-acidente',
@@ -32,6 +32,21 @@ const services = [
       'BPC/LOAS — Benefício de Prestação Continuada',
       'Benefício para idosos acima de 65 anos',
       'Benefício para pessoas com deficiência',
+    ],
+  },
+  {
+    id: 'trabalhista',
+    icon: '💼',
+    title: 'Direito Trabalhista',
+    subtitle: 'Proteção dos seus direitos nas relações de trabalho',
+    items: [
+      'Demissão sem justa causa e rescisão indireta',
+      'Horas extras e banco de horas não pagos',
+      'Assédio moral e sexual no trabalho',
+      'FGTS não depositado ou sacado indevidamente',
+      'Adicional de insalubridade e periculosidade',
+      'Estabilidade no emprego (gestante, acidente, doença)',
+      'Equiparação salarial e discriminação remuneratória',
     ],
   },
 ]
@@ -55,7 +70,7 @@ export default function Services() {
         </div>
 
         {/* Service Cards */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {services.map((service) => (
             <div key={service.id} className="card-primary flex flex-col p-8">
               {/* Icon */}
@@ -94,7 +109,7 @@ export default function Services() {
               {/* CTA */}
               <a
                 href={service.id === 'professores' ? '/professores' : WHATSAPP_URL}
-                {...(service.id === 'professores' ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
+                {...(service.id !== 'professores' ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                 className="mt-8 w-full text-center btn-primary justify-center"
               >
                 Quero Consultar Este Serviço

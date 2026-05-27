@@ -21,9 +21,11 @@ export default function Hero() {
                        text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem]
                        max-w-4xl mx-auto mb-6 animate-fade-up">
           Advocacia Especializada em{' '}
-          <span className="text-secondary">Direito Previdenciário (INSS)</span>{' '}
-          e Direitos do{' '}
-          <span className="text-secondary">Servidor Público</span>
+          <span className="text-secondary">Direito Previdenciário (RPPS e RGPS)</span>
+          {', '}
+          <span className="text-secondary">Direito Trabalhista</span>{' '}
+          e Direito dos{' '}
+          <span className="text-secondary">Servidores Públicos</span>
         </h1>
 
         {/* Divider */}
@@ -66,8 +68,9 @@ export default function Hero() {
         {/* Trust strip */}
         <div className="mt-16 flex flex-wrap items-center justify-center gap-8 animate-fade-up">
           {[
-            { icon: '⚖️', text: 'Direito dos Professores' },
+            { icon: '⚖️', text: 'Direito dos Servidores Públicos' },
             { icon: '🏛️', text: 'Direito Previdenciário' },
+            { icon: '💼', text: 'Direito Trabalhista' },
           ].map((item) => (
             <div key={item.text}
               className="flex items-center gap-2 text-white/60">

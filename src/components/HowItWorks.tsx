@@ -28,9 +28,9 @@ const steps = [
   {
     number: '04',
     icon: '✅',
-    title: 'Resultado Garantido',
+    title: 'Resolução do Seu Caso',
     description:
-      'Trabalhamos incansavelmente até a resolução do seu caso. Seu direito garantido é o nosso objetivo final.',
+      'Trabalhamos incansavelmente até a resolução do seu caso. Seu direito é o nosso objetivo final.',
     highlight: 'Foco em resultados concretos',
   },
 ]
