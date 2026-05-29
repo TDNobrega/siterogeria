@@ -228,6 +228,30 @@ export default function Professores() {
                     desc: 'Progressões suspensas durante 2020–2022 geraram perdas que, em muitos casos, não foram compensadas. A Justiça tem reconhecido o direito à reposição.',
                     tag: 'Ação judicial',
                   },
+                  {
+                    icon: '🏖️',
+                    title: 'Terço das Férias 45 Dias',
+                    desc: 'Professores estaduais do RJ têm direito a 45 dias de férias — não 30. O terço constitucional deve ser calculado sobre esse período completo. O cálculo incorreto sobre 30 dias gera diferenças que podem ser cobradas retroativamente.',
+                    tag: 'Muito comum',
+                  },
+                  {
+                    icon: '📋',
+                    title: 'Implementação RET e Regência de Classe',
+                    desc: 'Servidores que atuaram no Regime Especial de Trabalho (RET) por ao menos um ano entre 1994 e 1998 podem solicitar a incorporação da gratificação nos proventos de aposentadoria. Aposentados que já recebem o abono de regência (L2.365/94) podem pleitear a atualização do valor histórico de R$ 82,84 com correção inflacionária e recálculo por hora/aula.',
+                    tag: 'Retroativo',
+                  },
+                  {
+                    icon: '💳',
+                    title: 'Descontos de Consignados RCC/RMC',
+                    desc: 'Descontos de RCC e RMC realizados sem autorização expressa ou acima da margem consignável são ilegais. É possível pleitear a devolução dos valores descontados indevidamente e suspender cobranças abusivas.',
+                    tag: 'Devolução',
+                  },
+                  {
+                    icon: '🧾',
+                    title: 'Isenção de Imposto de Renda',
+                    desc: 'Professores e aposentados portadores de doenças graves previstas em lei têm direito à isenção total de IR sobre proventos e pensões. Muitos nunca solicitaram e pagam imposto indevidamente há anos, com direito a restituição.',
+                    tag: 'Alto impacto',
+                  },
                 ].map(card => (
                   <div key={card.title}
                     className="bg-white border border-border rounded-2xl p-6
@@ -312,19 +336,40 @@ export default function Professores() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { value: '5 anos', label: 'a menos para se aposentar como professora' },
-                    { value: '100%', label: 'de integralidade possível com planejamento' },
-                    { value: '10+', label: 'anos atuando com professores do RJ' },
-                    { value: '500+', label: 'casos resolvidos em direito do magistério' },
-                  ].map(stat => (
-                    <div key={stat.label}
-                      className="bg-white rounded-2xl border border-border p-5 text-center shadow-sm">
-                      <p className="font-title font-bold text-2xl text-primary mb-1">{stat.value}</p>
-                      <p className="font-subtitle text-xs text-muted leading-tight">{stat.label}</p>
+                <div className="relative">
+                  <div className="relative rounded-2xl overflow-hidden aspect-[3/4]
+                                  max-w-sm mx-auto lg:mx-0 shadow-lg">
+                    <picture>
+                      <source srcSet="/assets/attorney.webp" type="image/webp" />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="/assets/attorney.jpg"
+                        alt="Dra. Rogéria Oliveira — Advogada Previdenciarista"
+                        className="w-full h-full object-cover object-top"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
+                  </div>
+                  <div className="absolute -bottom-6 -right-4 lg:right-0
+                                  bg-white rounded-2xl border border-border
+                                  shadow-lg p-5 w-52">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+                      {[
+                        { value: '5 anos', label: 'a menos para aposentar como professora' },
+                        { value: '100%', label: 'de integralidade possível' },
+                        { value: '10+', label: 'anos com professores RJ' },
+                        { value: '500+', label: 'casos resolvidos' },
+                      ].map(s => (
+                        <div key={s.label} className="text-center">
+                          <p className="font-title text-xl font-bold text-primary leading-none">{s.value}</p>
+                          <p className="font-subtitle text-[10px] text-muted mt-1 leading-tight">{s.label}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+                  <div className="absolute -top-3 -left-3 w-16 h-16 rounded-full
+                                  bg-primary/20 -z-10" />
                 </div>
               </div>
             </div>
