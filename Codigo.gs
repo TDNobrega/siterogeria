@@ -574,6 +574,15 @@ function obterOuCriarPasta(nomeCliente) {
 // Usa o campo 'pasta' do JSON do workspace como nome da subpasta
 // ============================================================
 function obterPastaWorkspaceDrive(workspace) {
+  // Prioridade 1: pastaId configurado explicitamente no JSON
+  if (workspace.pastaId) {
+    try {
+      return DriveApp.getFolderById(workspace.pastaId);
+    } catch (e) {
+      Logger.log('Aviso: pastaId inválido para ' + workspace.nome + ', usando nome: ' + e.message);
+    }
+  }
+  // Fallback: cria subpasta pelo nome dentro da pasta raiz
   var nomePasta = workspace.pasta || workspace.nome || 'Sem Workspace';
   return obterOuCriarSubpasta(obterPastaRaiz(), nomePasta);
 }
@@ -1251,13 +1260,15 @@ function buscarMensagensMidia(workspace, contactId) {
   var mensagens = json.messages || [];
   var comMidia  = [];
 
+  // Tipos aceitos: imagens, PDFs e documentos Word — áudio e vídeo são ignorados
+  var TIPOS_ACEITOS = ['image', 'document'];
+
   for (var i = 0; i < mensagens.length; i++) {
     var msg = mensagens[i];
 
     if (msg.outbound)                         continue; // ignorar mensagens enviadas pelo escritório
     if (!msg.mediaUrl || msg.mediaUrl === '') continue; // sem mídia
-    if (msg.type === 'conversation')          continue; // texto puro
-    // filtro de timestamp removido — deduplicação por ID da mensagem garante sem repetição
+    if (TIPOS_ACEITOS.indexOf(msg.type) === -1) continue; // ignora áudio, vídeo e outros
 
     comMidia.push(msg);
   }
@@ -1320,8 +1331,6 @@ function processarMensagemMidia(msg, nomeContato, workspace, planilha) {
 function inferirMimeType(tipo) {
   var mapa = {
     'image':    'image/jpeg',
-    'video':    'video/mp4',
-    'audio':    'audio/ogg',
     'document': 'application/pdf'
   };
   return mapa[tipo] || 'application/octet-stream';
