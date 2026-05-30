@@ -201,7 +201,7 @@ function tratarDocumento(anexo, nomeCliente, remetente) {
   }
 
   var arquivo = salvarNoDrive(blob, nomeCliente);
-  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente);
+  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, 'Email', 'Email');
   Logger.log('Salvo: ' + arquivo.getName() + ' — ' + arquivo.getUrl());
 }
 
@@ -547,16 +547,18 @@ function obterOuCriarPasta(nomeCliente) {
 // ============================================================
 // REGISTRAR NA PLANILHA — aba 'Pendentes'
 // ============================================================
-function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo, remetente) {
+function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo, remetente, workspace, canal) {
   var c = cfg();
   if (!c.sheetId) throw new Error('SHEET_ID não configurado.');
 
-  var planilha = SpreadsheetApp.openById(c.sheetId);
-  var aba      = criarAbaPendentes(planilha);
-  var dataHora = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss');
+  var planilha    = SpreadsheetApp.openById(c.sheetId);
+  var aba         = criarAbaPendentes(planilha);
+  var dataHora    = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss');
+  var wsNome      = workspace || 'Email';
+  var canalNome   = canal    || 'Email';
 
-  aba.appendRow([dataHora, nomeCliente, tipoDocumento, nomeArquivo, urlArquivo, remetente, 'Pendente']);
-  Logger.log('Registrado na planilha: ' + nomeCliente + ' | ' + tipoDocumento);
+  aba.appendRow([dataHora, wsNome, canalNome, nomeCliente, tipoDocumento, nomeArquivo, urlArquivo, 'Pendente']);
+  Logger.log('Registrado na planilha: ' + wsNome + ' | ' + nomeCliente + ' | ' + tipoDocumento);
 }
 
 // ============================================================
@@ -567,13 +569,48 @@ function criarAbaPendentes(planilha) {
 
   if (!aba) {
     aba = planilha.insertSheet('Pendentes');
-    aba.appendRow(['Data/Hora', 'Cliente', 'Tipo de Documento', 'Nome do Arquivo', 'Link no Drive', 'Remetente', 'Status']);
-    aba.getRange(1, 1, 1, 7)
-      .setFontWeight('bold')
-      .setBackground('#4a86e8')
-      .setFontColor('#ffffff');
+  }
+
+  // Garante cabeçalho atualizado (8 colunas)
+  var cabecalho = aba.getRange(1, 1, 1, 8).getValues()[0];
+  if (cabecalho[0] !== 'Data/Hora' || cabecalho[1] !== 'Workspace') {
+    aba.clearContents();
+    aba.appendRow(['Data/Hora', 'Workspace', 'Canal', 'Cliente', 'Tipo de Documento', 'Nome do Arquivo', 'Link no Drive', 'Status']);
+
+    // Cabeçalho
+    var header = aba.getRange(1, 1, 1, 8);
+    header.setFontWeight('bold').setBackground('#1a237e').setFontColor('#ffffff').setFontSize(10);
     aba.setFrozenRows(1);
-    Logger.log('Aba "Pendentes" criada.');
+
+    // Larguras de coluna
+    aba.setColumnWidth(1, 140); // Data/Hora
+    aba.setColumnWidth(2, 160); // Workspace
+    aba.setColumnWidth(3, 90);  // Canal
+    aba.setColumnWidth(4, 180); // Cliente
+    aba.setColumnWidth(5, 150); // Tipo
+    aba.setColumnWidth(6, 180); // Arquivo
+    aba.setColumnWidth(7, 60);  // Link (botão)
+    aba.setColumnWidth(8, 110); // Status
+
+    // Formatação condicional — coluna Status (H)
+    var regras = [];
+    var cores = [
+      { texto: 'Pendente',    fundo: '#fff3e0', fonte: '#e65100' },
+      { texto: 'Em Análise', fundo: '#e3f2fd', fonte: '#0d47a1' },
+      { texto: 'Concluído',  fundo: '#e8f5e9', fonte: '#1b5e20' }
+    ];
+    cores.forEach(function(c) {
+      regras.push(SpreadsheetApp.newConditionalFormatRule()
+        .whenTextEqualTo(c.texto)
+        .setBackground(c.fundo)
+        .setFontColor(c.fonte)
+        .setBold(true)
+        .setRanges([aba.getRange('H2:H1000')])
+        .build());
+    });
+    aba.setConditionalFormatRules(regras);
+
+    Logger.log('Aba "Pendentes" criada/atualizada (8 colunas).');
   }
 
   return aba;
@@ -627,6 +664,130 @@ function marcarMensagemProcessada(planilha, msgId, nomeContato, nomeWorkspace, t
   var aba      = planilha.getSheetByName('Processados');
   var dataHora = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss');
   aba.appendRow([dataHora, msgId, nomeContato, nomeWorkspace, tipo || 'Documento']);
+}
+
+// ============================================================
+// DASHBOARD — visão executiva com contadores por workspace/status
+// ============================================================
+function criarDashboard(planilha) {
+  var aba = planilha.getSheetByName('Dashboard');
+  if (!aba) {
+    aba = planilha.insertSheet('Dashboard', 0); // primeira aba
+  } else {
+    aba.clearContents();
+    aba.clearFormats();
+    aba.clearConditionalFormatRules();
+  }
+
+  // Lê workspaces configurados
+  var workspaces = [];
+  try {
+    var wsJson = PropertiesService.getScriptProperties().getProperty('LIDERHUB_WORKSPACES');
+    if (wsJson) workspaces = JSON.parse(wsJson).map(function(w) { return w.nome; });
+  } catch(e) {}
+  workspaces.push('Email');
+
+  var ts  = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy 'às' HH:mm");
+  var cor = '#1a237e';
+
+  // ── Título ──────────────────────────────────────────────────
+  aba.getRange('A1:G1').merge()
+    .setValue('PAINEL DE DOCUMENTOS — ROGÉRIA OLIVEIRA ADVOCACIA')
+    .setBackground(cor).setFontColor('#ffffff')
+    .setFontWeight('bold').setFontSize(13).setHorizontalAlignment('center');
+
+  aba.getRange('A2:G2').merge()
+    .setValue('Atualizado em: ' + ts)
+    .setFontColor('#757575').setFontSize(9).setHorizontalAlignment('center');
+
+  // ── Seção: Por Workspace ─────────────────────────────────────
+  aba.getRange('A4:G4').merge()
+    .setValue('DOCUMENTOS POR WORKSPACE')
+    .setBackground('#e8eaf6').setFontWeight('bold').setFontSize(10)
+    .setHorizontalAlignment('left');
+
+  var headerWs = ['Workspace', 'Pendente', 'Em Análise', 'Concluído', 'Total', '', ''];
+  aba.getRange(5, 1, 1, 7).setValues([headerWs])
+    .setFontWeight('bold').setBackground('#3949ab').setFontColor('#ffffff');
+
+  var linha = 6;
+  workspaces.forEach(function(ws) {
+    aba.getRange(linha, 1).setValue(ws);
+    aba.getRange(linha, 2).setFormula('=COUNTIFS(Pendentes!B:B,"' + ws + '",Pendentes!H:H,"Pendente")');
+    aba.getRange(linha, 3).setFormula('=COUNTIFS(Pendentes!B:B,"' + ws + '",Pendentes!H:H,"Em Análise")');
+    aba.getRange(linha, 4).setFormula('=COUNTIFS(Pendentes!B:B,"' + ws + '",Pendentes!H:H,"Concluído")');
+    aba.getRange(linha, 5).setFormula('=SUM(B' + linha + ':D' + linha + ')');
+    if (linha % 2 === 0) aba.getRange(linha, 1, 1, 5).setBackground('#f5f5f5');
+    linha++;
+  });
+
+  // Linha de totais
+  var totalLinha = linha;
+  aba.getRange(totalLinha, 1).setValue('TOTAL');
+  aba.getRange(totalLinha, 2).setFormula('=SUM(B6:B' + (totalLinha - 1) + ')');
+  aba.getRange(totalLinha, 3).setFormula('=SUM(C6:C' + (totalLinha - 1) + ')');
+  aba.getRange(totalLinha, 4).setFormula('=SUM(D6:D' + (totalLinha - 1) + ')');
+  aba.getRange(totalLinha, 5).setFormula('=SUM(E6:E' + (totalLinha - 1) + ')');
+  aba.getRange(totalLinha, 1, 1, 5).setFontWeight('bold').setBackground('#c5cae9');
+
+  // ── Seção: Este Mês ──────────────────────────────────────────
+  var mesLinha = totalLinha + 2;
+  aba.getRange(mesLinha, 1, 1, 3).merge()
+    .setValue('ESTE MÊS')
+    .setBackground('#e8eaf6').setFontWeight('bold').setFontSize(10);
+
+  var mesInicio = '=DATE(YEAR(TODAY()),MONTH(TODAY()),1)';
+  var mesFim    = '=DATE(YEAR(TODAY()),MONTH(TODAY())+1,1)';
+
+  var estatisticas = [
+    ['Documentos recebidos', '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ')'],
+    ['Pendentes',            '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ',Pendentes!H:H,"Pendente")'],
+    ['Em Análise',           '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ',Pendentes!H:H,"Em Análise")'],
+    ['Concluídos',           '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ',Pendentes!H:H,"Concluído")']
+  ];
+
+  estatisticas.forEach(function(stat, i) {
+    var r = mesLinha + 1 + i;
+    aba.getRange(r, 1).setValue(stat[0]);
+    aba.getRange(r, 2).setFormula(stat[1]).setFontWeight('bold').setFontSize(11);
+    if (i % 2 === 0) aba.getRange(r, 1, 1, 2).setBackground('#f5f5f5');
+  });
+
+  // ── Seção: Últimos Documentos ────────────────────────────────
+  var ultsLinha = mesLinha + estatisticas.length + 2;
+  aba.getRange(ultsLinha, 1, 1, 7).merge()
+    .setValue('ÚLTIMOS 5 DOCUMENTOS RECEBIDOS')
+    .setBackground('#e8eaf6').setFontWeight('bold').setFontSize(10);
+
+  aba.getRange(ultsLinha + 1, 1).setFormula(
+    '=IFERROR(QUERY(Pendentes!A2:H1000,"SELECT A,B,D,E,H ORDER BY A DESC LIMIT 5",0),"Nenhum documento ainda")'
+  );
+
+  // ── Formatação geral ─────────────────────────────────────────
+  aba.setColumnWidth(1, 180);
+  aba.setColumnWidth(2, 100);
+  aba.setColumnWidth(3, 100);
+  aba.setColumnWidth(4, 100);
+  aba.setColumnWidth(5, 80);
+  aba.setColumnWidths(6, 2, 40);
+
+  Logger.log('Dashboard atualizado.');
+  return aba;
+}
+
+// ============================================================
+// CONFIGURAR PLANILHA — rodar UMA VEZ para criar todas as abas
+// ============================================================
+function configurarPlanilha() {
+  var c = cfg();
+  if (!c.sheetId) throw new Error('SHEET_ID não configurado.');
+  var planilha = SpreadsheetApp.openById(c.sheetId);
+
+  criarDashboard(planilha);
+  criarAbaPendentes(planilha);
+  criarAbaProcessados(planilha);
+
+  Logger.log('Planilha configurada: Dashboard + Pendentes + Processados.');
 }
 
 // ============================================================
@@ -810,6 +971,14 @@ function verificarLiderHub() {
     }
   }
 
+  // Atualiza Dashboard com timestamp e contadores frescos
+  try {
+    var c = cfg();
+    if (c.sheetId) criarDashboard(SpreadsheetApp.openById(c.sheetId));
+  } catch (e) {
+    Logger.log('Aviso: não foi possível atualizar Dashboard: ' + e.message);
+  }
+
   Logger.log('=== verificarLiderHub concluído ===');
 }
 
@@ -985,7 +1154,7 @@ function processarMensagemMidia(msg, nomeContato, workspace, planilha) {
     getBytes:       function() { return blobFinal.getBytes(); }
   };
 
-  var tipo = tratarDocumentoWorkspace(anexoMock, nomeContato, 'WhatsApp: ' + nomeContato, workspace.pastaId);
+  var tipo = tratarDocumentoWorkspace(anexoMock, nomeContato, 'WhatsApp: ' + nomeContato, workspace.pastaId, workspace.nome);
 
   // Registra ID da mensagem como processado — evita duplicatas em execuções futuras
   marcarMensagemProcessada(planilha, msg.id, nomeContato, workspace.nome, tipo);
@@ -1007,7 +1176,7 @@ function inferirMimeType(tipo) {
 // ============================================================
 // TRATAR DOCUMENTO WORKSPACE — pipeline completo com pasta de workspace
 // ============================================================
-function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId) {
+function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWorkspace) {
   var nomeOriginal = anexo.getName();
   var mimeType     = anexo.getContentType();
   Logger.log('[LiderHub] Tratando: ' + nomeOriginal + ' (' + mimeType + ')');
@@ -1032,7 +1201,7 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId) {
   }
 
   var arquivo = salvarNoDriveWorkspace(blob, nomeCliente, pastaId);
-  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente);
+  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, nomeWorkspace, 'WhatsApp');
   Logger.log('[LiderHub] Salvo: ' + arquivo.getName() + ' | ' + arquivo.getUrl());
   return tipo;
 }
