@@ -88,14 +88,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!image) return res.status(400).json({ error: 'image required' })
 
   try {
-    const inputBuffer = Buffer.from(image, 'base64')
+    const inputBuffer = Buffer.from(image, 'base64') as Buffer
     const validAngulo = [0, 90, 180, 270].includes(angulo) ? angulo : 0
     const workingMime = mimeType === 'image/png' ? 'image/png' : 'image/jpeg'
 
     // ── Passo 1: Rotação ────────────────────────────────────────
-    let workingBuffer = inputBuffer
+    let workingBuffer: Buffer = inputBuffer
     if (validAngulo !== 0) {
-      workingBuffer = await sharp(inputBuffer).rotate(validAngulo).toBuffer()
+      workingBuffer = (await sharp(inputBuffer).rotate(validAngulo).toBuffer()) as Buffer
     }
 
     // ── Passo 2: Dimensões + bbox via Gemini ────────────────────
