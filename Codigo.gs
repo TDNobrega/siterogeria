@@ -1116,7 +1116,18 @@ function verificarLiderHub() {
 
   var workspaces;
   try {
-    workspaces = JSON.parse(workspacesJson);
+    // Remove quebras de linha e espaços extras que o editor de Script Properties insere
+    var jsonLimpo = workspacesJson.replace(/[\r\n]+/g, '').replace(/\s{2,}/g, ' ');
+    workspaces = JSON.parse(jsonLimpo).map(function(ws) {
+      return {
+        id:      (ws.id      || '').replace(/\s/g, ''),
+        key:     (ws.key     || '').replace(/\s/g, ''),
+        nome:    (ws.nome    || '').trim().replace(/\s{2,}/g, ' '),
+        pasta:   (ws.pasta   || '').trim(),
+        pastaId: (ws.pastaId || '').replace(/\s/g, ''),
+        tagId:   (ws.tagId   || '').replace(/\s/g, '')
+      };
+    });
   } catch (e) {
     Logger.log('ERRO ao parsear LIDERHUB_WORKSPACES: ' + e.message);
     return;
