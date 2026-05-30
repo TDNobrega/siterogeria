@@ -580,6 +580,56 @@ function criarAbaPendentes(planilha) {
 }
 
 // ============================================================
+// DEDUPLICAÇÃO — cache de IDs de mensagens já processadas
+// Evita reprocessar documentos e salva doc enviado antes da tag
+// ============================================================
+
+// Cache em memória válido por execução — reseta entre triggers
+var _processadosCache = null;
+
+function criarAbaProcessados(planilha) {
+  var aba = planilha.getSheetByName('Processados');
+  if (!aba) {
+    aba = planilha.insertSheet('Processados');
+    aba.appendRow(['Data/Hora', 'ID da Mensagem', 'Cliente', 'Workspace', 'Tipo de Documento']);
+    aba.getRange(1, 1, 1, 5)
+      .setFontWeight('bold')
+      .setBackground('#6aa84f')
+      .setFontColor('#ffffff');
+    aba.setFrozenRows(1);
+    aba.setColumnWidth(2, 300);
+    Logger.log('Aba "Processados" criada.');
+  }
+  return aba;
+}
+
+function getProcessadosCache(planilha) {
+  if (_processadosCache !== null) return _processadosCache;
+  var aba   = criarAbaProcessados(planilha);
+  var dados = aba.getDataRange().getValues();
+  _processadosCache = {};
+  for (var i = 1; i < dados.length; i++) {
+    var id = dados[i][1];
+    if (id) _processadosCache[String(id)] = true;
+  }
+  Logger.log('[Processados] Cache carregado: ' + Object.keys(_processadosCache).length + ' IDs');
+  return _processadosCache;
+}
+
+function isMensagemProcessada(planilha, msgId) {
+  if (!msgId) return false;
+  return getProcessadosCache(planilha)[String(msgId)] === true;
+}
+
+function marcarMensagemProcessada(planilha, msgId, nomeContato, nomeWorkspace, tipo) {
+  if (!msgId) return;
+  getProcessadosCache(planilha)[String(msgId)] = true;
+  var aba      = planilha.getSheetByName('Processados');
+  var dataHora = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss');
+  aba.appendRow([dataHora, msgId, nomeContato, nomeWorkspace, tipo || 'Documento']);
+}
+
+// ============================================================
 // IDENTIFICAR TIPO POR NOME — heurística para PDFs
 // ============================================================
 function identificarTipoPorNome(nome) {
@@ -733,6 +783,7 @@ function instalarTriggerLiderHub() {
 // Lê LIDERHUB_WORKSPACES das Script Properties (JSON array)
 // ============================================================
 function verificarLiderHub() {
+  _processadosCache = null; // reseta cache a cada execução do trigger
   Logger.log('=== verificarLiderHub iniciado ===');
 
   var props = PropertiesService.getScriptProperties();
@@ -772,11 +823,14 @@ function processarWorkspace(workspace) {
   var lastRunKey = 'LIDERHUB_LAST_RUN_' + workspace.id;
   var lastRun    = props.getProperty(lastRunKey);
 
-  // Na primeira execução, olha para a última hora
+  // Na primeira execução, olha para as últimas 48h para capturar docs enviados antes da tag
   if (!lastRun) {
-    lastRun = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    Logger.log('Primeira execução — usando janela de 1h: ' + lastRun);
+    lastRun = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+    Logger.log('Primeira execução — usando janela de 48h: ' + lastRun);
   }
+
+  var c        = cfg();
+  var planilha = SpreadsheetApp.openById(c.sheetId);
 
   var novaUltimaRun = new Date().toISOString();
   var contatos      = buscarContatosRecentes(workspace, lastRun);
@@ -790,14 +844,19 @@ function processarWorkspace(workspace) {
       ? contato.contactName.trim()
       : (contato.contactNumber || 'Contato Desconhecido');
 
-    var mensagens = buscarMensagensMidia(workspace, contato.id, lastRun);
+    var mensagens = buscarMensagensMidia(workspace, contato.id);
 
     for (var j = 0; j < mensagens.length; j++) {
+      var msg = mensagens[j];
+      if (isMensagemProcessada(planilha, msg.id)) {
+        Logger.log('[Dedup] Pulando mensagem já processada: ' + msg.id);
+        continue;
+      }
       try {
-        processarMensagemMidia(mensagens[j], nomeContato, workspace);
+        processarMensagemMidia(msg, nomeContato, workspace, planilha);
         totalDocs++;
       } catch (e) {
-        Logger.log('ERRO na mensagem ' + mensagens[j].id + ': ' + e.message);
+        Logger.log('ERRO na mensagem ' + msg.id + ': ' + e.message);
       }
       Utilities.sleep(400); // respeita rate limit 3 req/s
     }
@@ -849,7 +908,7 @@ function buscarContatosRecentes(workspace, modifiedAfter) {
 // ============================================================
 // BUSCAR MENSAGENS COM MÍDIA — filtra por timestamp e outbound=false
 // ============================================================
-function buscarMensagensMidia(workspace, contactId, apos) {
+function buscarMensagensMidia(workspace, contactId) {
   var url = LIDERHUB_BASE_URL + '/v1/message'
     + '?contact=' + contactId
     + '&limit=50&page=1';
@@ -865,18 +924,17 @@ function buscarMensagensMidia(workspace, contactId, apos) {
     return [];
   }
 
-  var json     = JSON.parse(resp.getContentText());
+  var json      = JSON.parse(resp.getContentText());
   var mensagens = json.messages || [];
-  var limite   = new Date(apos).getTime();
-  var comMidia = [];
+  var comMidia  = [];
 
   for (var i = 0; i < mensagens.length; i++) {
     var msg = mensagens[i];
 
-    if (msg.outbound)                          continue; // ignorar mensagens enviadas pelo escritório
-    if (!msg.mediaUrl || msg.mediaUrl === '')  continue; // sem mídia
-    if (msg.type === 'conversation')           continue; // texto puro
-    if (new Date(msg.createdAt).getTime() <= limite) continue; // já processada
+    if (msg.outbound)                         continue; // ignorar mensagens enviadas pelo escritório
+    if (!msg.mediaUrl || msg.mediaUrl === '') continue; // sem mídia
+    if (msg.type === 'conversation')          continue; // texto puro
+    // filtro de timestamp removido — deduplicação por ID da mensagem garante sem repetição
 
     comMidia.push(msg);
   }
@@ -887,7 +945,7 @@ function buscarMensagensMidia(workspace, contactId, apos) {
 // ============================================================
 // PROCESSAR MENSAGEM COM MÍDIA — baixa e envia ao pipeline
 // ============================================================
-function processarMensagemMidia(msg, nomeContato, workspace) {
+function processarMensagemMidia(msg, nomeContato, workspace, planilha) {
   Logger.log('[LiderHub] Baixando: ' + msg.type + ' | ' + msg.mediaUrl);
 
   // Tenta baixar sem autenticação primeiro (URL pública da mídia)
@@ -914,7 +972,7 @@ function processarMensagemMidia(msg, nomeContato, workspace) {
   blob.setContentType(mimeType);
 
   // Nome do arquivo baseado no tipo e timestamp
-  var ext      = mimeType.split('/')[1] || 'bin';
+  var ext       = mimeType.split('/')[1] || 'bin';
   var nomeFinal = msg.type + '_' + new Date(msg.createdAt).getTime() + '.' + ext;
   blob.setName(nomeFinal);
 
@@ -927,7 +985,10 @@ function processarMensagemMidia(msg, nomeContato, workspace) {
     getBytes:       function() { return blobFinal.getBytes(); }
   };
 
-  tratarDocumentoWorkspace(anexoMock, nomeContato, 'WhatsApp: ' + nomeContato, workspace.pasta);
+  var tipo = tratarDocumentoWorkspace(anexoMock, nomeContato, 'WhatsApp: ' + nomeContato, workspace.pastaId);
+
+  // Registra ID da mensagem como processado — evita duplicatas em execuções futuras
+  marcarMensagemProcessada(planilha, msg.id, nomeContato, workspace.nome, tipo);
 }
 
 // ============================================================
@@ -946,7 +1007,7 @@ function inferirMimeType(tipo) {
 // ============================================================
 // TRATAR DOCUMENTO WORKSPACE — pipeline completo com pasta de workspace
 // ============================================================
-function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaWorkspace) {
+function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId) {
   var nomeOriginal = anexo.getName();
   var mimeType     = anexo.getContentType();
   Logger.log('[LiderHub] Tratando: ' + nomeOriginal + ' (' + mimeType + ')');
@@ -970,26 +1031,23 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaWorkspace)
     blob      = anexo.copyBlob().setName(nomeFinal);
   }
 
-  var arquivo = salvarNoDriveWorkspace(blob, nomeCliente, pastaWorkspace);
+  var arquivo = salvarNoDriveWorkspace(blob, nomeCliente, pastaId);
   registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente);
   Logger.log('[LiderHub] Salvo: ' + arquivo.getName() + ' | ' + arquivo.getUrl());
+  return tipo;
 }
 
 // ============================================================
-// SALVAR NO DRIVE WORKSPACE — hierarquia: PASTA_NOME / workspace / cliente
+// SALVAR NO DRIVE WORKSPACE — acessa pasta diretamente por ID
 // ============================================================
-function salvarNoDriveWorkspace(blob, nomeCliente, pastaWorkspace) {
-  var iter    = DriveApp.getFoldersByName(PASTA_NOME);
-  var raiz    = iter.hasNext() ? iter.next() : DriveApp.createFolder(PASTA_NOME);
-
-  var wsIter  = raiz.getFoldersByName(pastaWorkspace);
-  var pastaWs = wsIter.hasNext() ? wsIter.next() : raiz.createFolder(pastaWorkspace);
+function salvarNoDriveWorkspace(blob, nomeCliente, pastaId) {
+  var pastaWs = DriveApp.getFolderById(pastaId);
 
   var cliIter  = pastaWs.getFoldersByName(nomeCliente);
   var pastaCli = cliIter.hasNext() ? cliIter.next() : pastaWs.createFolder(nomeCliente);
 
   var arquivo = pastaCli.createFile(blob);
-  Logger.log('[LiderHub] Drive: ' + pastaWorkspace + '/' + nomeCliente + '/' + arquivo.getName());
+  Logger.log('[LiderHub] Drive: ' + pastaWs.getName() + '/' + nomeCliente + '/' + arquivo.getName());
   return arquivo;
 }
 
@@ -1214,4 +1272,13 @@ function testarLiderHub() {
   }
 
   Logger.log('=== Teste LiderHub concluído ===');
+}
+
+function debugWorkspaces() {
+  var props = PropertiesService.getScriptProperties();
+  var json  = props.getProperty('LIDERHUB_WORKSPACES');
+  var ws    = JSON.parse(json);
+  for (var i = 0; i < ws.length; i++) {
+    Logger.log(ws[i].nome + ' | key length: ' + ws[i].key.length + ' | key: [' + ws[i].key + ']');
+  }
 }
