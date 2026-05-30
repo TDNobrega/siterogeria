@@ -887,14 +887,13 @@ function testarConfiguracao() {
     }
   }
 
-  checar('GEMINI_API_KEY',      c.geminiKey);
-  checar('CLOUDINARY_CLOUD_NAME', c.cloudinaryCloud  ? c.cloudinaryCloud  : null);
-  checar('CLOUDINARY_API_KEY',  c.cloudinaryApiKey);
-  checar('CLOUDINARY_API_SECRET', c.cloudinarySecret);
-  checar('SHEET_ID',            c.sheetId);
+  checar('GEMINI_API_KEY',       c.geminiKey);
+  checar('SHEET_ID',             c.sheetId);
+  checar('VERCEL_PROCESS_URL',   c.vercelProcessUrl);
+  checar('VERCEL_PROCESS_KEY',   c.vercelProcessKey);
 
-  if (c.cloudinaryCloud) Logger.log('  (cloud name: ' + c.cloudinaryCloud + ')');
-  if (c.sheetId)         Logger.log('  (sheet id: '   + c.sheetId + ')');
+  if (c.sheetId)           Logger.log('  (sheet id: '      + c.sheetId + ')');
+  if (c.vercelProcessUrl)  Logger.log('  (process url: '   + c.vercelProcessUrl + ')');
 
   if (c.sheetId) {
     try {
