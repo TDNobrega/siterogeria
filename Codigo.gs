@@ -590,7 +590,7 @@ function obterPastaWorkspaceDrive(workspace) {
 // ============================================================
 // REGISTRAR NA PLANILHA — aba 'Pendentes'
 // ============================================================
-function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo, remetente, workspace, canal, planilha) {
+function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo, remetente, workspace, canal, planilha, emailExtra) {
   var c         = cfg();
   if (!c.sheetId) throw new Error('SHEET_ID não configurado.');
   var pl        = planilha || SpreadsheetApp.openById(c.sheetId);
@@ -602,8 +602,8 @@ function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo
   aba.appendRow([new Date(), wsNome, canalNome, nomeCliente, tipoDocumento, nomeArquivo, urlArquivo, 'Pendente']);
 
   // Substitui URL bruta por link clicável "📄 Abrir"
-  var lastRow   = aba.getLastRow();
-  var richText  = SpreadsheetApp.newRichTextValue()
+  var lastRow  = aba.getLastRow();
+  var richText = SpreadsheetApp.newRichTextValue()
     .setText('📄 Abrir')
     .setLinkUrl(urlArquivo)
     .build();
@@ -611,11 +611,12 @@ function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo
 
   // Acumula no buffer para envio de alerta agrupado ao final do ciclo
   _alertasBuffer.push({
-    nomeCliente:  nomeCliente,
+    nomeCliente:   nomeCliente,
     tipoDocumento: tipoDocumento,
-    workspace:    wsNome,
-    canal:        canalNome,
-    urlArquivo:   urlArquivo
+    workspace:     wsNome,
+    canal:         canalNome,
+    urlArquivo:    urlArquivo,
+    emailExtra:    emailExtra || ''   // email adicional do workspace (ex: previdenciario@)
   });
 
   Logger.log('Registrado na planilha: ' + wsNome + ' | ' + nomeCliente + ' | ' + tipoDocumento);
@@ -947,6 +948,44 @@ function enviarAlertaSumario(alertas) {
   } catch (e) {
     Logger.log('Aviso: alerta email falhou: ' + e.message);
   }
+
+  // Envia cópias para emailExtra por workspace (ex: previdenciario@ para LOAS)
+  var porEmail = {};
+  alertas.forEach(function(a) {
+    if (a.emailExtra) {
+      if (!porEmail[a.emailExtra]) porEmail[a.emailExtra] = [];
+      porEmail[a.emailExtra].push(a);
+    }
+  });
+  Object.keys(porEmail).forEach(function(emailDest) {
+    var grupo    = porEmail[emailDest];
+    var assuntoE = grupo.length === 1
+      ? '[Doc] ' + grupo[0].tipoDocumento + ' — ' + grupo[0].nomeCliente
+      : '[' + grupo.length + ' Docs] ' + grupo[0].workspace;
+    var itensE = grupo.map(function(a) {
+      return '<div style="background:#f8f9fa;border-left:4px solid #1a237e;border-radius:4px;' +
+             'padding:10px 14px;margin-bottom:8px;">' +
+             '<strong style="color:#1a237e">' + a.tipoDocumento + '</strong>' +
+             ' &mdash; ' + a.nomeCliente + '<br>' +
+             '<a href="' + a.urlArquivo + '" style="color:#1a237e;font-size:12px">📄 Abrir no Drive →</a>' +
+             '</div>';
+    }).join('');
+    var htmlE =
+      '<div style="font-family:Arial,sans-serif;max-width:560px;color:#333">' +
+      '<div style="background:#1a237e;color:#fff;padding:14px 20px;border-radius:8px 8px 0 0">' +
+      '<b>' + grupo[0].workspace + ' — ' + grupo.length + ' Novo(s) Documento(s)</b></div>' +
+      '<div style="border:1px solid #e0e0e0;border-top:none;padding:20px;border-radius:0 0 8px 8px">' +
+      itensE + '</div></div>';
+    var txtE = grupo.map(function(a, i) {
+      return (i+1) + '. ' + a.tipoDocumento + ' — ' + a.nomeCliente + '\n   ' + a.urlArquivo;
+    }).join('\n\n');
+    try {
+      MailApp.sendEmail({ to: emailDest, subject: assuntoE, body: txtE, htmlBody: htmlE });
+      Logger.log('Alerta extra enviado para ' + emailDest + ' — ' + grupo.length + ' doc(s).');
+    } catch (e) {
+      Logger.log('Aviso: alerta extra falhou para ' + emailDest + ': ' + e.message);
+    }
+  });
 }
 
 // ============================================================
@@ -1093,12 +1132,13 @@ function lerWorkspaces() {
     var limpo = raw.replace(/[\r\n]+/g, '').replace(/\s{2,}/g, ' ');
     return JSON.parse(limpo).map(function(ws) {
       return {
-        id:      (ws.id      || '').replace(/\s/g, ''),
-        key:     (ws.key     || '').replace(/\s/g, ''),
-        nome:    (ws.nome    || '').trim().replace(/\s{2,}/g, ' '),
-        pasta:   (ws.pasta   || '').trim(),
-        pastaId: (ws.pastaId || '').replace(/\s/g, ''),
-        tagId:   (ws.tagId   || '').replace(/\s/g, '')
+        id:         (ws.id         || '').replace(/\s/g, ''),
+        key:        (ws.key        || '').replace(/\s/g, ''),
+        nome:       (ws.nome       || '').trim().replace(/\s{2,}/g, ' '),
+        pasta:      (ws.pasta      || '').trim(),
+        pastaId:    (ws.pastaId    || '').replace(/\s/g, ''),
+        tagId:      (ws.tagId      || '').replace(/\s/g, ''),
+        emailExtra: (ws.emailExtra || '').trim()
       };
     });
   } catch (e) {
@@ -1399,7 +1439,7 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, wsObj, nomeWork
   }
 
   var arquivo = salvarNoDriveWorkspace(blob, nomeCliente, wsObj);
-  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, nomeWorkspace, 'WhatsApp', planilha);
+  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, nomeWorkspace, 'WhatsApp', planilha, wsObj.emailExtra || '');
   Logger.log('[LiderHub] Editado salvo: ' + arquivo.getName() + ' | ' + arquivo.getUrl());
   return tipo;
 }
