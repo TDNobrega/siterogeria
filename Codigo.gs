@@ -1080,6 +1080,34 @@ function testarComImagem() {
 // ============================================================
 
 // ============================================================
+// LER WORKSPACES — lê, normaliza e retorna o array de workspaces
+// Remove espaços/quebras de linha inseridos pelo editor de Script Properties
+// ============================================================
+function lerWorkspaces() {
+  var raw = PropertiesService.getScriptProperties().getProperty('LIDERHUB_WORKSPACES');
+  if (!raw) {
+    Logger.log('LIDERHUB_WORKSPACES não configurado nas Script Properties.');
+    return null;
+  }
+  try {
+    var limpo = raw.replace(/[\r\n]+/g, '').replace(/\s{2,}/g, ' ');
+    return JSON.parse(limpo).map(function(ws) {
+      return {
+        id:      (ws.id      || '').replace(/\s/g, ''),
+        key:     (ws.key     || '').replace(/\s/g, ''),
+        nome:    (ws.nome    || '').trim().replace(/\s{2,}/g, ' '),
+        pasta:   (ws.pasta   || '').trim(),
+        pastaId: (ws.pastaId || '').replace(/\s/g, ''),
+        tagId:   (ws.tagId   || '').replace(/\s/g, '')
+      };
+    });
+  } catch (e) {
+    Logger.log('ERRO ao parsear LIDERHUB_WORKSPACES: ' + e.message);
+    return null;
+  }
+}
+
+// ============================================================
 // INSTALAR TRIGGER LIDERHUB — executa verificarLiderHub a cada 15 minutos
 // Rodar UMA VEZ manualmente no Apps Script Editor
 // ============================================================
@@ -1106,32 +1134,8 @@ function verificarLiderHub() {
   _alertasBuffer    = [];   // reseta buffer de alertas
   Logger.log('=== verificarLiderHub iniciado ===');
 
-  var props = PropertiesService.getScriptProperties();
-  var workspacesJson = props.getProperty('LIDERHUB_WORKSPACES');
-
-  if (!workspacesJson) {
-    Logger.log('LIDERHUB_WORKSPACES não configurado — ignorando canal WhatsApp.');
-    return;
-  }
-
-  var workspaces;
-  try {
-    // Remove quebras de linha e espaços extras que o editor de Script Properties insere
-    var jsonLimpo = workspacesJson.replace(/[\r\n]+/g, '').replace(/\s{2,}/g, ' ');
-    workspaces = JSON.parse(jsonLimpo).map(function(ws) {
-      return {
-        id:      (ws.id      || '').replace(/\s/g, ''),
-        key:     (ws.key     || '').replace(/\s/g, ''),
-        nome:    (ws.nome    || '').trim().replace(/\s{2,}/g, ' '),
-        pasta:   (ws.pasta   || '').trim(),
-        pastaId: (ws.pastaId || '').replace(/\s/g, ''),
-        tagId:   (ws.tagId   || '').replace(/\s/g, '')
-      };
-    });
-  } catch (e) {
-    Logger.log('ERRO ao parsear LIDERHUB_WORKSPACES: ' + e.message);
-    return;
-  }
+  var workspaces = lerWorkspaces();
+  if (!workspaces) return;
 
   for (var i = 0; i < workspaces.length; i++) {
     try {
@@ -1649,15 +1653,8 @@ function buscarTodasMensagensMidia(workspace, contactId) {
 function testarLiderHub() {
   Logger.log('=== Teste LiderHub ===');
 
-  var props          = PropertiesService.getScriptProperties();
-  var workspacesJson = props.getProperty('LIDERHUB_WORKSPACES');
-
-  if (!workspacesJson) {
-    Logger.log('❌ LIDERHUB_WORKSPACES não configurado nas Script Properties.');
-    return;
-  }
-
-  var workspaces = JSON.parse(workspacesJson);
+  var workspaces = lerWorkspaces();
+  if (!workspaces) return;
   Logger.log('Workspaces configurados: ' + workspaces.length);
 
   for (var i = 0; i < workspaces.length; i++) {
