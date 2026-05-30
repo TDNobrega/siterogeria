@@ -87,6 +87,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (!image) return res.status(400).json({ error: 'image required' })
 
+  const MIME_PERMITIDOS = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic']
+  if (!MIME_PERMITIDOS.includes(mimeType)) {
+    return res.status(400).json({ error: 'mimeType não suportado.' })
+  }
+
   try {
     const inputBuffer = Buffer.from(image, 'base64') as Buffer
     const validAngulo = [0, 90, 180, 270].includes(angulo) ? angulo : 0
@@ -147,8 +152,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       mimeType: 'image/jpeg',
     })
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Processing failed'
-    console.error('[process-document]', message)
-    return res.status(500).json({ error: message })
+    console.error('[process-document]', err instanceof Error ? err.message : err)
+    return res.status(500).json({ error: 'Erro interno no processamento.' })
   }
 }

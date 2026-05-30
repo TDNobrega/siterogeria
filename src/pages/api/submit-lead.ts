@@ -26,7 +26,7 @@ async function cadastrarContato(numero: string, nome: string, email: string) {
   if (email)          body.email = email
   if (LIDERHUB_AGENT) body.agent = LIDERHUB_AGENT
 
-  console.log('LiderHub request body:', JSON.stringify(body))
+  console.log('LiderHub: cadastrando contato')
 
   const res = await fetch('https://api.liderhub.com.br/v1/contacts', {
     method:  'POST',
@@ -58,8 +58,19 @@ const EXTENSOES_PERMITIDAS = ['.pdf', '.jpg', '.jpeg', '.png', '.webp']
 const TAMANHO_MAX_NOME     = 200
 
 // ── Handler principal ─────────────────────────────────────────────────────────
+const ORIGENS_PERMITIDAS = [
+  'https://rogeriaoliveira.com',
+  'https://www.rogeriaoliveira.com',
+]
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
+
+  // Bloqueia submissões de origens externas (proteção básica contra bots)
+  const origin = req.headers.origin || ''
+  if (process.env.NODE_ENV === 'production' && !ORIGENS_PERMITIDAS.includes(origin)) {
+    return res.status(403).json({ error: 'Origem não permitida.' })
+  }
 
   const { nome, telefone, email, situacao, mensagem, arquivo_nome, arquivo_path } = req.body
 

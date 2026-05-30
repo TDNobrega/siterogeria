@@ -3,10 +3,10 @@ import crypto from 'crypto'
 import { getAdminSupabase } from '../../../lib/supabase'
 
 function getAdminToken() {
-  return crypto
-    .createHmac('sha256', process.env.ADMIN_SALT || 'rogeria-admin-2025')
-    .update(process.env.ADMIN_PASSWORD || '')
-    .digest('hex')
+  const salt = process.env.ADMIN_SALT
+  const pass = process.env.ADMIN_PASSWORD
+  if (!salt || !pass) throw new Error('ADMIN_SALT e ADMIN_PASSWORD são obrigatórios.')
+  return crypto.createHmac('sha256', salt).update(pass).digest('hex')
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -21,6 +21,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { path } = req.query
   if (!path || typeof path !== 'string') {
     return res.status(400).json({ error: 'Caminho do arquivo não informado.' })
+  }
+
+  // Bloqueia path traversal e caracteres não permitidos em storage paths
+  if (
+    path.includes('..') ||
+    path.includes('//') ||
+    path.startsWith('/') ||
+    !/^[\w\-./]+$/.test(path)
+  ) {
+    return res.status(400).json({ error: 'Caminho de arquivo inválido.' })
   }
 
   try {

@@ -2,10 +2,10 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import crypto from 'crypto'
 
 function getAdminToken() {
-  return crypto
-    .createHmac('sha256', process.env.ADMIN_SALT || 'rogeria-admin-2025')
-    .update(process.env.ADMIN_PASSWORD || '')
-    .digest('hex')
+  const salt = process.env.ADMIN_SALT
+  const pass = process.env.ADMIN_PASSWORD
+  if (!salt || !pass) throw new Error('ADMIN_SALT e ADMIN_PASSWORD são obrigatórios.')
+  return crypto.createHmac('sha256', salt).update(pass).digest('hex')
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {

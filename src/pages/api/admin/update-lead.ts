@@ -3,10 +3,10 @@ import crypto from 'crypto'
 import { getAdminSupabase } from '../../../lib/supabase'
 
 function getAdminToken() {
-  return crypto
-    .createHmac('sha256', process.env.ADMIN_SALT || 'rogeria-admin-2025')
-    .update(process.env.ADMIN_PASSWORD || '')
-    .digest('hex')
+  const salt = process.env.ADMIN_SALT
+  const pass = process.env.ADMIN_PASSWORD
+  if (!salt || !pass) throw new Error('ADMIN_SALT e ADMIN_PASSWORD são obrigatórios.')
+  return crypto.createHmac('sha256', salt).update(pass).digest('hex')
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -21,9 +21,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { id, status, notas } = req.body
   if (!id) return res.status(400).json({ error: 'ID obrigatório.' })
 
+  const STATUS_PERMITIDOS = ['novo', 'em_analise', 'concluido', 'cancelado']
+  if (status && !STATUS_PERMITIDOS.includes(status)) {
+    return res.status(400).json({ error: 'Status inválido.' })
+  }
+
   const updateData: Record<string, string> = {}
   if (status) updateData.status = status
-  if (notas  !== undefined) updateData.notas = notas
+  if (notas !== undefined) updateData.notas = String(notas).slice(0, 5000)
 
   try {
     const db = getAdminSupabase()
