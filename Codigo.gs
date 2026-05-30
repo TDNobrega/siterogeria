@@ -36,7 +36,8 @@ function cfg() {
     geminiKey:        props.getProperty('GEMINI_API_KEY'),
     sheetId:          props.getProperty('SHEET_ID'),
     vercelProcessUrl: props.getProperty('VERCEL_PROCESS_URL'),
-    vercelProcessKey: props.getProperty('VERCEL_PROCESS_KEY')
+    vercelProcessKey: props.getProperty('VERCEL_PROCESS_KEY'),
+    alertEmail:       props.getProperty('ALERT_EMAIL') || 'intimacoes@rogeriaoliveira.com'
   };
 }
 
@@ -114,6 +115,7 @@ function instalarTrigger() {
 // VERIFICAR EMAILS — ponto de entrada principal
 // ============================================================
 function verificarEmails() {
+  _alertasBuffer = []; // reseta buffer de alertas
   Logger.log('=== verificarEmails iniciado ===');
   var threads = GmailApp.search(QUERY_EMAIL);
   Logger.log('Threads encontradas: ' + threads.length);
@@ -131,6 +133,11 @@ function verificarEmails() {
       }
     }
   }
+
+  // Envia alerta agrupado se houver documentos novos
+  enviarAlertaSumario(_alertasBuffer);
+  _alertasBuffer = [];
+
   Logger.log('=== verificarEmails concluído ===');
 }
 
@@ -574,15 +581,33 @@ function obterOuCriarPasta(nomeCliente) {
 // REGISTRAR NA PLANILHA — aba 'Pendentes'
 // ============================================================
 function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo, remetente, workspace, canal, planilha) {
-  var c       = cfg();
+  var c         = cfg();
   if (!c.sheetId) throw new Error('SHEET_ID não configurado.');
   var pl        = planilha || SpreadsheetApp.openById(c.sheetId);
   var aba       = criarAbaPendentes(pl);
   var wsNome    = workspace || 'Email';
   var canalNome = canal     || 'Email';
 
-  // Salva Date real (não texto) — necessário para COUNTIFS por data funcionar
+  // Salva Date real — necessário para COUNTIFS por data funcionar
   aba.appendRow([new Date(), wsNome, canalNome, nomeCliente, tipoDocumento, nomeArquivo, urlArquivo, 'Pendente']);
+
+  // Substitui URL bruta por link clicável "📄 Abrir"
+  var lastRow   = aba.getLastRow();
+  var richText  = SpreadsheetApp.newRichTextValue()
+    .setText('📄 Abrir')
+    .setLinkUrl(urlArquivo)
+    .build();
+  aba.getRange(lastRow, 7).setRichTextValue(richText);
+
+  // Acumula no buffer para envio de alerta agrupado ao final do ciclo
+  _alertasBuffer.push({
+    nomeCliente:  nomeCliente,
+    tipoDocumento: tipoDocumento,
+    workspace:    wsNome,
+    canal:        canalNome,
+    urlArquivo:   urlArquivo
+  });
+
   Logger.log('Registrado na planilha: ' + wsNome + ' | ' + nomeCliente + ' | ' + tipoDocumento);
 }
 
@@ -641,7 +666,27 @@ function criarAbaPendentes(planilha) {
     Logger.log('Aba "Pendentes" criada/atualizada (8 colunas).');
   }
 
+  // Sempre aplica (idempotente) — dropdown + filtro
+  _aplicarFormatacaoPendentes(aba);
   return aba;
+}
+
+// ============================================================
+// FORMATAR PENDENTES — dropdown de status + filtro automático
+// ============================================================
+function _aplicarFormatacaoPendentes(aba) {
+  // Dropdown de status na coluna H
+  var regra = SpreadsheetApp.newDataValidation()
+    .requireValueInList(['Pendente', 'Em Análise', 'Concluído'], true)
+    .setAllowInvalid(false)
+    .build();
+  aba.getRange('H2:H1000').setDataValidation(regra);
+
+  // Filtro automático no cabeçalho
+  if (!aba.getFilter()) aba.getRange(1, 1, 1, 8).createFilter();
+
+  // Coluna G mais estreita ("📄 Abrir" não precisa de muito espaço)
+  aba.setColumnWidth(7, 75);
 }
 
 // ============================================================
@@ -651,6 +696,9 @@ function criarAbaPendentes(planilha) {
 
 // Cache em memória válido por execução — reseta entre triggers
 var _processadosCache = null;
+
+// Buffer de alertas — acumula documentos do ciclo e envia 1 email resumido
+var _alertasBuffer = [];
 
 function criarAbaProcessados(planilha) {
   var aba = planilha.getSheetByName('Processados');
@@ -836,6 +884,62 @@ function configurarPlanilha() {
 }
 
 // ============================================================
+// ALERTA POR EMAIL — resume os documentos do ciclo em 1 email
+// ============================================================
+function enviarAlertaSumario(alertas) {
+  if (!alertas || alertas.length === 0) return;
+
+  var c      = cfg();
+  var email  = c.alertEmail;
+  var sheetUrl = 'https://docs.google.com/spreadsheets/d/' + c.sheetId;
+
+  var assunto = alertas.length === 1
+    ? '[Novo Doc] ' + alertas[0].tipoDocumento + ' — ' + alertas[0].nomeCliente
+    : '[' + alertas.length + ' Novos Docs] Recebidos agora';
+
+  // ── Corpo texto (fallback)
+  var linhasTxt = alertas.map(function(a, i) {
+    return (i + 1) + '. ' + a.tipoDocumento + ' — ' + a.nomeCliente +
+           '\n   ' + a.workspace + ' · ' + a.canal +
+           '\n   ' + a.urlArquivo;
+  });
+  var corpoTxt =
+    alertas.length + ' documento(s) novo(s) chegaram e estão prontos para análise.\n\n' +
+    linhasTxt.join('\n\n') + '\n\n' +
+    'Ver planilha: ' + sheetUrl;
+
+  // ── Corpo HTML
+  var itensHtml = alertas.map(function(a) {
+    return '<div style="background:#f8f9fa;border-left:4px solid #1a237e;border-radius:4px;' +
+           'padding:10px 14px;margin-bottom:8px;">' +
+           '<strong style="color:#1a237e">' + a.tipoDocumento + '</strong>' +
+           ' &mdash; ' + a.nomeCliente + '<br>' +
+           '<span style="color:#888;font-size:12px">' + a.workspace + ' &middot; ' + a.canal + '</span><br>' +
+           '<a href="' + a.urlArquivo + '" style="color:#1a237e;font-size:12px">📄 Abrir no Drive →</a>' +
+           '</div>';
+  }).join('');
+
+  var corpoHtml =
+    '<div style="font-family:Arial,sans-serif;max-width:560px;color:#333">' +
+    '<div style="background:#1a237e;color:#fff;padding:14px 20px;border-radius:8px 8px 0 0">' +
+    '<b style="font-size:15px">📄 ' + alertas.length + ' Novo(s) Documento(s) Recebido(s)</b></div>' +
+    '<div style="border:1px solid #e0e0e0;border-top:none;padding:20px;border-radius:0 0 8px 8px">' +
+    '<p style="margin:0 0 14px;color:#555">Prontos para análise na planilha:</p>' +
+    itensHtml +
+    '<hr style="border:none;border-top:1px solid #e0e0e0;margin:16px 0">' +
+    '<a href="' + sheetUrl + '" style="background:#1a237e;color:#fff;padding:10px 20px;' +
+    'border-radius:6px;text-decoration:none;font-size:13px">📊 Ver Planilha Completa</a>' +
+    '</div></div>';
+
+  try {
+    MailApp.sendEmail({ to: email, subject: assunto, body: corpoTxt, htmlBody: corpoHtml });
+    Logger.log('Alerta enviado para ' + email + ' — ' + alertas.length + ' doc(s).');
+  } catch (e) {
+    Logger.log('Aviso: alerta email falhou: ' + e.message);
+  }
+}
+
+// ============================================================
 // IDENTIFICAR TIPO POR NOME — heurística para PDFs
 // ============================================================
 function identificarTipoPorNome(nome) {
@@ -989,6 +1093,7 @@ function instalarTriggerLiderHub() {
 // ============================================================
 function verificarLiderHub() {
   _processadosCache = null; // reseta cache a cada execução do trigger
+  _alertasBuffer    = [];   // reseta buffer de alertas
   Logger.log('=== verificarLiderHub iniciado ===');
 
   var props = PropertiesService.getScriptProperties();
@@ -1022,6 +1127,10 @@ function verificarLiderHub() {
   } catch (e) {
     Logger.log('Aviso: não foi possível atualizar Dashboard: ' + e.message);
   }
+
+  // Envia alerta agrupado se houver documentos novos neste ciclo
+  enviarAlertaSumario(_alertasBuffer);
+  _alertasBuffer = [];
 
   Logger.log('=== verificarLiderHub concluído ===');
 }
