@@ -551,30 +551,31 @@ function salvarOriginalNoDrive(blob, nomeCliente, nomeArquivo) {
 }
 
 // ============================================================
+// OBTER PASTA RAIZ — retorna (ou cria) PASTA_NOME no Drive
+// ============================================================
+function obterPastaRaiz() {
+  var iter = DriveApp.getFoldersByName(PASTA_NOME);
+  if (iter.hasNext()) return iter.next();
+  var pasta = DriveApp.createFolder(PASTA_NOME);
+  Logger.log('Pasta raiz criada: ' + PASTA_NOME);
+  return pasta;
+}
+
+// ============================================================
 // OBTER OU CRIAR PASTA — hierarquia: PASTA_NOME / nomeCliente
+// (canal Email — sem subpasta de workspace)
 // ============================================================
 function obterOuCriarPasta(nomeCliente) {
-  var iter = DriveApp.getFoldersByName(PASTA_NOME);
-  var pastaRaiz;
+  return obterOuCriarSubpasta(obterPastaRaiz(), nomeCliente);
+}
 
-  if (iter.hasNext()) {
-    pastaRaiz = iter.next();
-  } else {
-    pastaRaiz = DriveApp.createFolder(PASTA_NOME);
-    Logger.log('Pasta raiz criada: ' + PASTA_NOME);
-  }
-
-  var subIter = pastaRaiz.getFoldersByName(nomeCliente);
-  var subPasta;
-
-  if (subIter.hasNext()) {
-    subPasta = subIter.next();
-  } else {
-    subPasta = pastaRaiz.createFolder(nomeCliente);
-    Logger.log('Subpasta criada: ' + nomeCliente);
-  }
-
-  return subPasta;
+// ============================================================
+// OBTER PASTA WORKSPACE — hierarquia: PASTA_NOME / [workspace.pasta]
+// Usa o campo 'pasta' do JSON do workspace como nome da subpasta
+// ============================================================
+function obterPastaWorkspaceDrive(workspace) {
+  var nomePasta = workspace.pasta || workspace.nome || 'Sem Workspace';
+  return obterOuCriarSubpasta(obterPastaRaiz(), nomePasta);
 }
 
 // ============================================================
@@ -1307,7 +1308,7 @@ function processarMensagemMidia(msg, nomeContato, workspace, planilha) {
     getBytes:       function() { return blobFinal.getBytes(); }
   };
 
-  var tipo = tratarDocumentoWorkspace(anexoMock, nomeContato, 'WhatsApp: ' + nomeContato, workspace.pastaId, workspace.nome, planilha);
+  var tipo = tratarDocumentoWorkspace(anexoMock, nomeContato, 'WhatsApp: ' + nomeContato, workspace, workspace.nome, planilha);
 
   // Registra ID da mensagem como processado — evita duplicatas em execuções futuras
   marcarMensagemProcessada(planilha, msg.id, nomeContato, workspace.nome, tipo);
@@ -1329,7 +1330,7 @@ function inferirMimeType(tipo) {
 // ============================================================
 // TRATAR DOCUMENTO WORKSPACE — pipeline completo com pasta de workspace
 // ============================================================
-function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWorkspace, planilha) {
+function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, wsObj, nomeWorkspace, planilha) {
   var nomeOriginal = anexo.getName();
   var mimeType     = anexo.getContentType();
   Logger.log('[LiderHub] Tratando: ' + nomeOriginal + ' (' + mimeType + ')');
@@ -1338,7 +1339,7 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWo
   var ext         = (mimeType.split('/')[1] || 'bin').split(';')[0];
   var nomeArqOrig = 'orig_' + new Date().getTime() + '.' + ext;
   try {
-    salvarOriginalNoDriveWorkspace(anexo.copyBlob(), nomeCliente, pastaId, nomeArqOrig);
+    salvarOriginalNoDriveWorkspace(anexo.copyBlob(), nomeCliente, wsObj, nomeArqOrig);
   } catch (e) {
     Logger.log('Aviso: não salvou original: ' + e.message);
   }
@@ -1373,7 +1374,7 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWo
     blob      = anexo.copyBlob().setName(nomeFinal);
   }
 
-  var arquivo = salvarNoDriveWorkspace(blob, nomeCliente, pastaId);
+  var arquivo = salvarNoDriveWorkspace(blob, nomeCliente, wsObj);
   registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, nomeWorkspace, 'WhatsApp', planilha);
   Logger.log('[LiderHub] Editado salvo: ' + arquivo.getName() + ' | ' + arquivo.getUrl());
   return tipo;
@@ -1382,8 +1383,8 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWo
 // ============================================================
 // SALVAR NO DRIVE WORKSPACE — acessa pasta diretamente por ID
 // ============================================================
-function salvarNoDriveWorkspace(blob, nomeCliente, pastaId) {
-  var pastaWs   = DriveApp.getFolderById(pastaId);
+function salvarNoDriveWorkspace(blob, nomeCliente, workspace) {
+  var pastaWs   = obterPastaWorkspaceDrive(workspace);
   var pastaCli  = obterOuCriarSubpasta(pastaWs, nomeCliente);
   var pastaEdit = obterOuCriarSubpasta(pastaCli, 'Editado');
   var arquivo   = pastaEdit.createFile(blob);
@@ -1391,9 +1392,9 @@ function salvarNoDriveWorkspace(blob, nomeCliente, pastaId) {
   return arquivo;
 }
 
-function salvarOriginalNoDriveWorkspace(blob, nomeCliente, pastaId, nomeArquivo) {
+function salvarOriginalNoDriveWorkspace(blob, nomeCliente, workspace, nomeArquivo) {
   blob.setName(nomeArquivo);
-  var pastaWs   = DriveApp.getFolderById(pastaId);
+  var pastaWs   = obterPastaWorkspaceDrive(workspace);
   var pastaCli  = obterOuCriarSubpasta(pastaWs, nomeCliente);
   var pastaOrig = obterOuCriarSubpasta(pastaCli, 'Original');
   var arquivo   = pastaOrig.createFile(blob);
