@@ -187,8 +187,10 @@ function tratarDocumento(anexo, nomeCliente, remetente) {
   // ── Salva original imediatamente (fail-safe) ─────────────────
   var ext           = nomeOriginal.split('.').pop() || 'bin';
   var nomeArqOrig   = 'orig_' + new Date().getTime() + '.' + ext;
+  var idOriginal    = '';
   try {
-    salvarOriginalNoDrive(anexo.copyBlob(), nomeCliente, nomeArqOrig);
+    var arqOrig = salvarOriginalNoDrive(anexo.copyBlob(), nomeCliente, nomeArqOrig);
+    if (arqOrig) idOriginal = arqOrig.getId();
   } catch (e) {
     Logger.log('Aviso: não salvou original: ' + e.message);
   }
@@ -224,7 +226,7 @@ function tratarDocumento(anexo, nomeCliente, remetente) {
   }
 
   var arquivo = salvarNoDrive(blob, nomeCliente);
-  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, 'Email', 'Email');
+  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, 'Email', 'Email', null, '', idOriginal);
   Logger.log('Editado salvo: ' + arquivo.getName() + ' — ' + arquivo.getUrl());
 }
 
@@ -590,7 +592,7 @@ function obterPastaWorkspaceDrive(workspace) {
 // ============================================================
 // REGISTRAR NA PLANILHA — aba 'Pendentes'
 // ============================================================
-function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo, remetente, workspace, canal, planilha, emailExtra) {
+function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo, remetente, workspace, canal, planilha, emailExtra, idOriginal) {
   var c         = cfg();
   if (!c.sheetId) throw new Error('SHEET_ID não configurado.');
   var pl        = planilha || SpreadsheetApp.openById(c.sheetId);
@@ -599,7 +601,7 @@ function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo
   var canalNome = canal     || 'Email';
 
   // Salva Date real — necessário para COUNTIFS por data funcionar
-  aba.appendRow([new Date(), wsNome, canalNome, nomeCliente, tipoDocumento, nomeArquivo, urlArquivo, 'Pendente']);
+  aba.appendRow([new Date(), wsNome, canalNome, nomeCliente, tipoDocumento, nomeArquivo, urlArquivo, 'Pendente', idOriginal || '']);
 
   // Substitui URL bruta por link clicável "📄 Abrir"
   var lastRow  = aba.getLastRow();
@@ -632,18 +634,18 @@ function criarAbaPendentes(planilha) {
     aba = planilha.insertSheet('Pendentes');
   }
 
-  // Garante cabeçalho atualizado (8 colunas)
-  var cabecalho = aba.getRange(1, 1, 1, 8).getValues()[0];
-  if (cabecalho[0] !== 'Data/Hora' || cabecalho[1] !== 'Workspace') {
+  // Garante cabeçalho atualizado (9 colunas — inclui ID Original para reprocessamento)
+  var cabecalho = aba.getRange(1, 1, 1, 9).getValues()[0];
+  if (cabecalho[0] !== 'Data/Hora' || cabecalho[1] !== 'Workspace' || cabecalho[8] !== 'ID Original') {
     aba.clearContents();
-    aba.appendRow(['Data/Hora', 'Workspace', 'Canal', 'Cliente', 'Tipo de Documento', 'Nome do Arquivo', 'Link no Drive', 'Status']);
+    aba.appendRow(['Data/Hora', 'Workspace', 'Canal', 'Cliente', 'Tipo de Documento', 'Nome do Arquivo', 'Link no Drive', 'Status', 'ID Original']);
 
     // Cabeçalho
-    var header = aba.getRange(1, 1, 1, 8);
+    var header = aba.getRange(1, 1, 1, 9);
     header.setFontWeight('bold').setBackground('#1a237e').setFontColor('#ffffff').setFontSize(10);
     aba.setFrozenRows(1);
 
-    // Formata coluna A como data/hora real (permite COUNTIFS por data)
+    // Formata coluna A como data/hora real
     aba.getRange('A2:A1000').setNumberFormat('dd/mm/yyyy HH:mm:ss');
 
     // Larguras de coluna
@@ -653,15 +655,17 @@ function criarAbaPendentes(planilha) {
     aba.setColumnWidth(4, 180); // Cliente
     aba.setColumnWidth(5, 150); // Tipo
     aba.setColumnWidth(6, 180); // Arquivo
-    aba.setColumnWidth(7, 60);  // Link (botão)
-    aba.setColumnWidth(8, 110); // Status
+    aba.setColumnWidth(7, 75);  // Link (📄 Abrir)
+    aba.setColumnWidth(8, 120); // Status
+    aba.setColumnWidth(9, 1);   // ID Original — oculto (1px)
 
     // Formatação condicional — coluna Status (H)
     var regras = [];
     var cores = [
-      { texto: 'Pendente',    fundo: '#fff3e0', fonte: '#e65100' },
-      { texto: 'Em Análise', fundo: '#e3f2fd', fonte: '#0d47a1' },
-      { texto: 'Concluído',  fundo: '#e8f5e9', fonte: '#1b5e20' }
+      { texto: 'Pendente',       fundo: '#fff3e0', fonte: '#e65100' },
+      { texto: 'Aprovado',       fundo: '#e8f5e9', fonte: '#1b5e20' },
+      { texto: 'Reprovado',      fundo: '#ffebee', fonte: '#b71c1c' },
+      { texto: 'Reprocessando',  fundo: '#f3e5f5', fonte: '#6a1b9a' }
     ];
     cores.forEach(function(c) {
       regras.push(SpreadsheetApp.newConditionalFormatRule()
@@ -674,7 +678,7 @@ function criarAbaPendentes(planilha) {
     });
     aba.setConditionalFormatRules(regras);
 
-    Logger.log('Aba "Pendentes" criada/atualizada (8 colunas).');
+    Logger.log('Aba "Pendentes" criada/atualizada (9 colunas).');
   }
 
   // Sempre aplica (idempotente) — dropdown + filtro
@@ -686,18 +690,15 @@ function criarAbaPendentes(planilha) {
 // FORMATAR PENDENTES — dropdown de status + filtro automático
 // ============================================================
 function _aplicarFormatacaoPendentes(aba) {
-  // Dropdown de status na coluna H
+  // Dropdown de status: Aprovado/Reprovado controlam o reprocessamento automático
   var regra = SpreadsheetApp.newDataValidation()
-    .requireValueInList(['Pendente', 'Em Análise', 'Concluído'], true)
+    .requireValueInList(['Pendente', 'Aprovado', 'Reprovado'], true)
     .setAllowInvalid(false)
     .build();
   aba.getRange('H2:H1000').setDataValidation(regra);
 
-  // Filtro automático no cabeçalho
-  if (!aba.getFilter()) aba.getRange(1, 1, 1, 8).createFilter();
-
-  // Coluna G mais estreita ("📄 Abrir" não precisa de muito espaço)
-  aba.setColumnWidth(7, 75);
+  // Filtro automático no cabeçalho (9 colunas)
+  if (!aba.getFilter()) aba.getRange(1, 1, 1, 9).createFilter();
 }
 
 // ============================================================
@@ -793,7 +794,7 @@ function criarDashboard(planilha) {
     .setBackground('#e8eaf6').setFontWeight('bold').setFontSize(10)
     .setHorizontalAlignment('left');
 
-  var headerWs = ['Workspace', 'Pendente', 'Em Análise', 'Concluído', 'Total', '', ''];
+  var headerWs = ['Workspace', 'Pendente', 'Aprovado', 'Reprovado', 'Total', '', ''];
   aba.getRange(5, 1, 1, 7).setValues([headerWs])
     .setFontWeight('bold').setBackground('#3949ab').setFontColor('#ffffff');
 
@@ -801,8 +802,8 @@ function criarDashboard(planilha) {
   workspaces.forEach(function(ws) {
     aba.getRange(linha, 1).setValue(ws);
     aba.getRange(linha, 2).setFormula('=COUNTIFS(Pendentes!B:B,"' + ws + '",Pendentes!H:H,"Pendente")');
-    aba.getRange(linha, 3).setFormula('=COUNTIFS(Pendentes!B:B,"' + ws + '",Pendentes!H:H,"Em Análise")');
-    aba.getRange(linha, 4).setFormula('=COUNTIFS(Pendentes!B:B,"' + ws + '",Pendentes!H:H,"Concluído")');
+    aba.getRange(linha, 3).setFormula('=COUNTIFS(Pendentes!B:B,"' + ws + '",Pendentes!H:H,"Aprovado")');
+    aba.getRange(linha, 4).setFormula('=COUNTIFS(Pendentes!B:B,"' + ws + '",Pendentes!H:H,"Reprovado")');
     aba.getRange(linha, 5).setFormula('=SUM(B' + linha + ':D' + linha + ')');
     if (linha % 2 === 0) aba.getRange(linha, 1, 1, 5).setBackground('#f5f5f5');
     linha++;
@@ -830,8 +831,8 @@ function criarDashboard(planilha) {
   var estatisticas = [
     ['Documentos recebidos', '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ')'],
     ['Pendentes',            '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ',Pendentes!H:H,"Pendente")'],
-    ['Em Análise',           '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ',Pendentes!H:H,"Em Análise")'],
-    ['Concluídos',           '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ',Pendentes!H:H,"Concluído")']
+    ['Aprovados',            '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ',Pendentes!H:H,"Aprovado")'],
+    ['Reprovados',           '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ',Pendentes!H:H,"Reprovado")']
   ];
 
   estatisticas.forEach(function(stat, i) {
@@ -1119,6 +1120,100 @@ function testarComImagem() {
 // ============================================================
 
 // ============================================================
+// REPROCESSAR REPROVADOS — relê o original e refaz o processamento
+// Chamado automaticamente a cada ciclo do trigger verificarLiderHub
+// ============================================================
+function reprocessarReprovados() {
+  var c = cfg();
+  if (!c.sheetId) return;
+
+  var planilha   = SpreadsheetApp.openById(c.sheetId);
+  var aba        = planilha.getSheetByName('Pendentes');
+  if (!aba) return;
+
+  var dados      = aba.getDataRange().getValues();
+  var workspaces = lerWorkspaces() || [];
+  var total      = 0;
+
+  for (var i = 1; i < dados.length; i++) {
+    var linha      = dados[i];
+    var status     = linha[7]; // col H
+    var idOriginal = String(linha[8] || '').trim(); // col I
+
+    if (status !== 'Reprovado' || !idOriginal) continue;
+
+    var wsNome      = linha[1]; // col B
+    var nomeCliente = linha[3]; // col D
+    var tipoAtual   = linha[4]; // col E
+
+    // Encontra workspace config pelo nome
+    var ws = null;
+    for (var j = 0; j < workspaces.length; j++) {
+      if (workspaces[j].nome === wsNome) { ws = workspaces[j]; break; }
+    }
+
+    // Marca como reprocessando
+    aba.getRange(i + 1, 8).setValue('Reprocessando');
+    SpreadsheetApp.flush();
+
+    try {
+      var arquivoOrig = DriveApp.getFileById(idOriginal);
+      var blobOrig    = arquivoOrig.getBlob();
+      var mime        = blobOrig.getContentType() || 'image/jpeg';
+
+      var tipo, blobFinal;
+
+      if (mime.indexOf('image/') === 0) {
+        var bytes   = blobOrig.getBytes();
+        var b64     = Utilities.base64Encode(bytes);
+        var analise = analisarComGemini(b64, mime);
+        tipo        = analise.tipo || tipoAtual || 'Documento';
+        var angulo  = analise.rotacao || 0;
+
+        try {
+          var blobLimpo = processarImagemViaVercel(arquivoOrig.getBlob(), mime, angulo);
+          blobFinal = converterParaPdf(blobLimpo, tipo);
+        } catch (e) {
+          blobFinal = converterParaPdf(arquivoOrig.getBlob(), tipo);
+        }
+
+      } else if (mime === 'application/pdf') {
+        tipo      = identificarTipoPorNome(arquivoOrig.getName());
+        blobFinal = arquivoOrig.getBlob();
+      } else {
+        tipo      = tipoAtual || 'Documento';
+        blobFinal = arquivoOrig.getBlob();
+      }
+
+      blobFinal.setName(tipo + '.pdf');
+
+      var arquivoEditado = ws
+        ? salvarNoDriveWorkspace(blobFinal, nomeCliente, ws)
+        : salvarNoDrive(blobFinal, nomeCliente);
+
+      // Atualiza link e status na planilha
+      var richText = SpreadsheetApp.newRichTextValue()
+        .setText('📄 Abrir')
+        .setLinkUrl(arquivoEditado.getUrl())
+        .build();
+      aba.getRange(i + 1, 7).setRichTextValue(richText);
+      aba.getRange(i + 1, 8).setValue('Pendente');
+
+      Logger.log('[Reprocess] ✅ ' + nomeCliente + ' → ' + tipo + '.pdf');
+      total++;
+
+    } catch (e) {
+      aba.getRange(i + 1, 8).setValue('Reprovado'); // restaura status
+      Logger.log('[Reprocess] ❌ ' + nomeCliente + ': ' + e.message);
+    }
+
+    Utilities.sleep(1000);
+  }
+
+  if (total > 0) Logger.log('[Reprocess] ' + total + ' documento(s) reprocessado(s).');
+}
+
+// ============================================================
 // LER WORKSPACES — lê, normaliza e retorna o array de workspaces
 // Remove espaços/quebras de linha inseridos pelo editor de Script Properties
 // ============================================================
@@ -1173,6 +1268,11 @@ function verificarLiderHub() {
   _processadosCache = null; // reseta cache a cada execução do trigger
   _alertasBuffer    = [];   // reseta buffer de alertas
   Logger.log('=== verificarLiderHub iniciado ===');
+
+  // Reprocessa documentos reprovados antes de buscar novos
+  try { reprocessarReprovados(); } catch (e) {
+    Logger.log('Aviso: reprocessamento falhou: ' + e.message);
+  }
 
   var workspaces = lerWorkspaces();
   if (!workspaces) return;
@@ -1402,8 +1502,10 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, wsObj, nomeWork
   // ── Salva original imediatamente (fail-safe) ─────────────────
   var ext         = (mimeType.split('/')[1] || 'bin').split(';')[0];
   var nomeArqOrig = 'orig_' + new Date().getTime() + '.' + ext;
+  var idOriginal  = '';
   try {
-    salvarOriginalNoDriveWorkspace(anexo.copyBlob(), nomeCliente, wsObj, nomeArqOrig);
+    var arqOrig = salvarOriginalNoDriveWorkspace(anexo.copyBlob(), nomeCliente, wsObj, nomeArqOrig);
+    if (arqOrig) idOriginal = arqOrig.getId();
   } catch (e) {
     Logger.log('Aviso: não salvou original: ' + e.message);
   }
@@ -1439,7 +1541,7 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, wsObj, nomeWork
   }
 
   var arquivo = salvarNoDriveWorkspace(blob, nomeCliente, wsObj);
-  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, nomeWorkspace, 'WhatsApp', planilha, wsObj.emailExtra || '');
+  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, nomeWorkspace, 'WhatsApp', planilha, wsObj.emailExtra || '', idOriginal);
   Logger.log('[LiderHub] Editado salvo: ' + arquivo.getName() + ' | ' + arquivo.getUrl());
   return tipo;
 }
