@@ -34,10 +34,9 @@ function cfg() {
   var props = PropertiesService.getScriptProperties();
   return {
     geminiKey:        props.getProperty('GEMINI_API_KEY'),
-    cloudinaryCloud:  props.getProperty('CLOUDINARY_CLOUD_NAME'),
-    cloudinaryApiKey: props.getProperty('CLOUDINARY_API_KEY'),
-    cloudinarySecret: props.getProperty('CLOUDINARY_API_SECRET'),
-    sheetId:          props.getProperty('SHEET_ID')
+    sheetId:          props.getProperty('SHEET_ID'),
+    vercelProcessUrl: props.getProperty('VERCEL_PROCESS_URL'),
+    vercelProcessKey: props.getProperty('VERCEL_PROCESS_KEY')
   };
 }
 
@@ -178,23 +177,40 @@ function tratarDocumento(anexo, nomeCliente, remetente) {
   var mimeType     = anexo.getContentType();
   Logger.log('Tratando: ' + nomeOriginal + ' (' + mimeType + ')');
 
+  // ── Salva original imediatamente (fail-safe) ─────────────────
+  var ext           = nomeOriginal.split('.').pop() || 'bin';
+  var nomeArqOrig   = 'orig_' + new Date().getTime() + '.' + ext;
+  try {
+    salvarOriginalNoDrive(anexo.copyBlob(), nomeCliente, nomeArqOrig);
+  } catch (e) {
+    Logger.log('Aviso: não salvou original: ' + e.message);
+  }
+
   var nomeFinal, blob, tipo;
 
   if (mimeType === 'application/pdf') {
-    // PDF recebido: apenas renomeia pelo tipo
     tipo      = identificarTipoPorNome(nomeOriginal);
     nomeFinal = tipo + '.pdf';
     blob      = anexo.copyBlob().setName(nomeFinal);
 
   } else if (mimeType.indexOf('image/') === 0) {
-    // IMAGEM: processa com Gemini + Cloudinary e converte para PDF
-    var resultado = tratarNoCloudinary(anexo, nomeOriginal, mimeType);
-    tipo          = resultado.tipo;
-    blob          = converterParaPdf(resultado.blob, tipo);
-    nomeFinal     = tipo + '.pdf';
+    var bytes   = anexo.copyBlob().getBytes();
+    var base64  = Utilities.base64Encode(bytes);
+    var analise = analisarComGemini(base64, mimeType);
+    tipo        = analise.tipo   || 'Documento';
+    var angulo  = analise.rotacao || 0;
+
+    try {
+      var blobLimpo = processarImagemViaVercel(anexo.copyBlob(), mimeType, angulo);
+      blob      = converterParaPdf(blobLimpo, tipo);
+      nomeFinal = tipo + '.pdf';
+    } catch (e) {
+      Logger.log('Aviso: processamento Vercel falhou, convertendo original: ' + e.message);
+      blob      = converterParaPdf(anexo.copyBlob(), tipo);
+      nomeFinal = tipo + '_original.pdf';
+    }
 
   } else {
-    // Outros formatos: salva como está
     tipo      = 'Documento';
     nomeFinal = 'Documento_' + nomeOriginal;
     blob      = anexo.copyBlob().setName(nomeFinal);
@@ -202,7 +218,7 @@ function tratarDocumento(anexo, nomeCliente, remetente) {
 
   var arquivo = salvarNoDrive(blob, nomeCliente);
   registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, 'Email', 'Email');
-  Logger.log('Salvo: ' + arquivo.getName() + ' — ' + arquivo.getUrl());
+  Logger.log('Editado salvo: ' + arquivo.getName() + ' — ' + arquivo.getUrl());
 }
 
 // ============================================================
@@ -511,9 +527,19 @@ function assinarCloudinary(parametros, secret) {
 // SALVAR NO DRIVE — salva blob na subpasta do cliente
 // ============================================================
 function salvarNoDrive(blob, nomeCliente) {
-  var pasta   = obterOuCriarPasta(nomeCliente);
-  var arquivo = pasta.createFile(blob);
-  Logger.log('Arquivo criado no Drive: ' + arquivo.getName() + ' | Pasta: ' + pasta.getName());
+  var pastaCli  = obterOuCriarPasta(nomeCliente);
+  var pastaEdit = obterOuCriarSubpasta(pastaCli, 'Editado');
+  var arquivo   = pastaEdit.createFile(blob);
+  Logger.log('Editado salvo: ' + arquivo.getName() + ' | ' + pastaEdit.getName());
+  return arquivo;
+}
+
+function salvarOriginalNoDrive(blob, nomeCliente, nomeArquivo) {
+  blob.setName(nomeArquivo);
+  var pastaCli  = obterOuCriarPasta(nomeCliente);
+  var pastaOrig = obterOuCriarSubpasta(pastaCli, 'Original');
+  var arquivo   = pastaOrig.createFile(blob);
+  Logger.log('Original salvo: ' + arquivo.getName() + ' | ' + pastaOrig.getName());
   return arquivo;
 }
 
@@ -1200,6 +1226,15 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWo
   var mimeType     = anexo.getContentType();
   Logger.log('[LiderHub] Tratando: ' + nomeOriginal + ' (' + mimeType + ')');
 
+  // ── Salva original imediatamente (fail-safe) ─────────────────
+  var ext         = (mimeType.split('/')[1] || 'bin').split(';')[0];
+  var nomeArqOrig = 'orig_' + new Date().getTime() + '.' + ext;
+  try {
+    salvarOriginalNoDriveWorkspace(anexo.copyBlob(), nomeCliente, pastaId, nomeArqOrig);
+  } catch (e) {
+    Logger.log('Aviso: não salvou original: ' + e.message);
+  }
+
   var nomeFinal, blob, tipo;
 
   if (mimeType === 'application/pdf') {
@@ -1208,10 +1243,21 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWo
     blob      = anexo.copyBlob().setName(nomeFinal);
 
   } else if (mimeType.indexOf('image/') === 0) {
-    var resultado = tratarNoCloudinary(anexo, nomeOriginal, mimeType);
-    tipo          = resultado.tipo;
-    blob          = converterParaPdf(resultado.blob, tipo);
-    nomeFinal     = tipo + '.pdf';
+    var bytes   = anexo.copyBlob().getBytes();
+    var base64  = Utilities.base64Encode(bytes);
+    var analise = analisarComGemini(base64, mimeType);
+    tipo        = analise.tipo    || 'Documento';
+    var angulo  = analise.rotacao || 0;
+
+    try {
+      var blobLimpo = processarImagemViaVercel(anexo.copyBlob(), mimeType, angulo);
+      blob      = converterParaPdf(blobLimpo, tipo);
+      nomeFinal = tipo + '.pdf';
+    } catch (e) {
+      Logger.log('Aviso: Vercel falhou, convertendo original: ' + e.message);
+      blob      = converterParaPdf(anexo.copyBlob(), tipo);
+      nomeFinal = tipo + '_original.pdf';
+    }
 
   } else {
     tipo      = 'Documento';
@@ -1221,7 +1267,7 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWo
 
   var arquivo = salvarNoDriveWorkspace(blob, nomeCliente, pastaId);
   registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, nomeWorkspace, 'WhatsApp', planilha);
-  Logger.log('[LiderHub] Salvo: ' + arquivo.getName() + ' | ' + arquivo.getUrl());
+  Logger.log('[LiderHub] Editado salvo: ' + arquivo.getName() + ' | ' + arquivo.getUrl());
   return tipo;
 }
 
@@ -1229,14 +1275,62 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWo
 // SALVAR NO DRIVE WORKSPACE — acessa pasta diretamente por ID
 // ============================================================
 function salvarNoDriveWorkspace(blob, nomeCliente, pastaId) {
-  var pastaWs = DriveApp.getFolderById(pastaId);
-
-  var cliIter  = pastaWs.getFoldersByName(nomeCliente);
-  var pastaCli = cliIter.hasNext() ? cliIter.next() : pastaWs.createFolder(nomeCliente);
-
-  var arquivo = pastaCli.createFile(blob);
-  Logger.log('[LiderHub] Drive: ' + pastaWs.getName() + '/' + nomeCliente + '/' + arquivo.getName());
+  var pastaWs   = DriveApp.getFolderById(pastaId);
+  var pastaCli  = obterOuCriarSubpasta(pastaWs, nomeCliente);
+  var pastaEdit = obterOuCriarSubpasta(pastaCli, 'Editado');
+  var arquivo   = pastaEdit.createFile(blob);
+  Logger.log('[LiderHub] Editado: ' + pastaWs.getName() + '/' + nomeCliente + '/Editado/' + arquivo.getName());
   return arquivo;
+}
+
+function salvarOriginalNoDriveWorkspace(blob, nomeCliente, pastaId, nomeArquivo) {
+  blob.setName(nomeArquivo);
+  var pastaWs   = DriveApp.getFolderById(pastaId);
+  var pastaCli  = obterOuCriarSubpasta(pastaWs, nomeCliente);
+  var pastaOrig = obterOuCriarSubpasta(pastaCli, 'Original');
+  var arquivo   = pastaOrig.createFile(blob);
+  Logger.log('[LiderHub] Original: ' + pastaWs.getName() + '/' + nomeCliente + '/Original/' + arquivo.getName());
+  return arquivo;
+}
+
+// ============================================================
+// OBTER OU CRIAR SUBPASTA — helper para criar Original/Editado
+// ============================================================
+function obterOuCriarSubpasta(pastaPai, nomeSub) {
+  var iter = pastaPai.getFoldersByName(nomeSub);
+  return iter.hasNext() ? iter.next() : pastaPai.createFolder(nomeSub);
+}
+
+// ============================================================
+// PROCESSAR IMAGEM VIA VERCEL — substitui Cloudinary
+// Recebe blob bruto, retorna JPEG limpo (rotacionado + crop + realce)
+// ============================================================
+function processarImagemViaVercel(blob, mimeType, angulo) {
+  var c = cfg();
+  if (!c.vercelProcessUrl || !c.vercelProcessKey) {
+    throw new Error('VERCEL_PROCESS_URL ou VERCEL_PROCESS_KEY não configurado nas Script Properties.');
+  }
+
+  var bytes  = blob.getBytes();
+  var base64 = Utilities.base64Encode(bytes);
+
+  var resp = UrlFetchApp.fetch(c.vercelProcessUrl, {
+    method:      'post',
+    contentType: 'application/json',
+    payload:     JSON.stringify({ image: base64, mimeType: mimeType, angulo: angulo }),
+    headers:     { 'x-api-key': c.vercelProcessKey },
+    muteHttpExceptions: true
+  });
+
+  if (resp.getResponseCode() !== 200) {
+    throw new Error('process-document HTTP ' + resp.getResponseCode() + ': ' + resp.getContentText().slice(0, 200));
+  }
+
+  var json = JSON.parse(resp.getContentText());
+  if (!json.image) throw new Error('Resposta inválida: campo image ausente.');
+
+  var outputBytes = Utilities.base64Decode(json.image);
+  return Utilities.newBlob(outputBytes, 'image/jpeg', 'processado.jpg');
 }
 
 // ============================================================
