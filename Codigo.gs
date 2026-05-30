@@ -547,17 +547,16 @@ function obterOuCriarPasta(nomeCliente) {
 // ============================================================
 // REGISTRAR NA PLANILHA — aba 'Pendentes'
 // ============================================================
-function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo, remetente, workspace, canal) {
-  var c = cfg();
+function registrarNaPlanilha(nomeCliente, nomeArquivo, tipoDocumento, urlArquivo, remetente, workspace, canal, planilha) {
+  var c       = cfg();
   if (!c.sheetId) throw new Error('SHEET_ID não configurado.');
+  var pl        = planilha || SpreadsheetApp.openById(c.sheetId);
+  var aba       = criarAbaPendentes(pl);
+  var wsNome    = workspace || 'Email';
+  var canalNome = canal     || 'Email';
 
-  var planilha    = SpreadsheetApp.openById(c.sheetId);
-  var aba         = criarAbaPendentes(planilha);
-  var dataHora    = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss');
-  var wsNome      = workspace || 'Email';
-  var canalNome   = canal    || 'Email';
-
-  aba.appendRow([dataHora, wsNome, canalNome, nomeCliente, tipoDocumento, nomeArquivo, urlArquivo, 'Pendente']);
+  // Salva Date real (não texto) — necessário para COUNTIFS por data funcionar
+  aba.appendRow([new Date(), wsNome, canalNome, nomeCliente, tipoDocumento, nomeArquivo, urlArquivo, 'Pendente']);
   Logger.log('Registrado na planilha: ' + wsNome + ' | ' + nomeCliente + ' | ' + tipoDocumento);
 }
 
@@ -581,6 +580,9 @@ function criarAbaPendentes(planilha) {
     var header = aba.getRange(1, 1, 1, 8);
     header.setFontWeight('bold').setBackground('#1a237e').setFontColor('#ffffff').setFontSize(10);
     aba.setFrozenRows(1);
+
+    // Formata coluna A como data/hora real (permite COUNTIFS por data)
+    aba.getRange('A2:A1000').setNumberFormat('dd/mm/yyyy HH:mm:ss');
 
     // Larguras de coluna
     aba.setColumnWidth(1, 140); // Data/Hora
@@ -635,6 +637,7 @@ function criarAbaProcessados(planilha) {
       .setFontColor('#ffffff');
     aba.setFrozenRows(1);
     aba.setColumnWidth(2, 300);
+    aba.getRange('A2:A5000').setNumberFormat('dd/mm/yyyy HH:mm:ss');
     Logger.log('Aba "Processados" criada.');
   }
   return aba;
@@ -661,9 +664,8 @@ function isMensagemProcessada(planilha, msgId) {
 function marcarMensagemProcessada(planilha, msgId, nomeContato, nomeWorkspace, tipo) {
   if (!msgId) return;
   getProcessadosCache(planilha)[String(msgId)] = true;
-  var aba      = planilha.getSheetByName('Processados');
-  var dataHora = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss');
-  aba.appendRow([dataHora, msgId, nomeContato, nomeWorkspace, tipo || 'Documento']);
+  var aba = planilha.getSheetByName('Processados');
+  aba.appendRow([new Date(), msgId, nomeContato, nomeWorkspace, tipo || 'Documento']);
 }
 
 // ============================================================
@@ -736,8 +738,9 @@ function criarDashboard(planilha) {
     .setValue('ESTE MÊS')
     .setBackground('#e8eaf6').setFontWeight('bold').setFontSize(10);
 
-  var mesInicio = '=DATE(YEAR(TODAY()),MONTH(TODAY()),1)';
-  var mesFim    = '=DATE(YEAR(TODAY()),MONTH(TODAY())+1,1)';
+  // Sem "=" no prefixo — são expressões dentro de uma fórmula maior, não fórmulas independentes
+  var mesInicio = 'DATE(YEAR(TODAY()),MONTH(TODAY()),1)';
+  var mesFim    = 'DATE(YEAR(TODAY()),MONTH(TODAY())+1,1)';
 
   var estatisticas = [
     ['Documentos recebidos', '=COUNTIFS(Pendentes!A:A,">="&' + mesInicio + ',Pendentes!A:A,"<"&' + mesFim + ')'],
@@ -759,9 +762,11 @@ function criarDashboard(planilha) {
     .setValue('ÚLTIMOS 5 DOCUMENTOS RECEBIDOS')
     .setBackground('#e8eaf6').setFontWeight('bold').setFontSize(10);
 
+  // ORDER BY A DESC funciona corretamente porque A é Date real (não texto)
   aba.getRange(ultsLinha + 1, 1).setFormula(
-    '=IFERROR(QUERY(Pendentes!A2:H1000,"SELECT A,B,D,E,H ORDER BY A DESC LIMIT 5",0),"Nenhum documento ainda")'
+    '=IFERROR(QUERY(Pendentes!A2:H1000,"SELECT A,B,D,E,H ORDER BY A DESC LIMIT 5 LABEL A \'Data/Hora\',B \'Workspace\',D \'Cliente\',E \'Tipo\',H \'Status\'",0),"Nenhum documento ainda")'
   );
+  aba.getRange(ultsLinha + 1, 1).setNumberFormat('dd/mm/yyyy HH:mm:ss');
 
   // ── Formatação geral ─────────────────────────────────────────
   aba.setColumnWidth(1, 180);
@@ -773,6 +778,20 @@ function criarDashboard(planilha) {
 
   Logger.log('Dashboard atualizado.');
   return aba;
+}
+
+// ============================================================
+// ATUALIZAR TIMESTAMP DO DASHBOARD — chamado a cada trigger (leve)
+// Só atualiza a célula A2; as fórmulas COUNTIFS se atualizam sozinhas
+// ============================================================
+function atualizarTimestampDashboard(planilha) {
+  var aba = planilha.getSheetByName('Dashboard');
+  if (!aba) {
+    criarDashboard(planilha); // primeira vez: cria estrutura completa
+    return;
+  }
+  var ts = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy 'às' HH:mm");
+  aba.getRange('A2').setValue('Atualizado em: ' + ts);
 }
 
 // ============================================================
@@ -971,10 +990,10 @@ function verificarLiderHub() {
     }
   }
 
-  // Atualiza Dashboard com timestamp e contadores frescos
+  // Atualiza apenas o timestamp do Dashboard (fórmulas COUNTIFS se atualizam sozinhas)
   try {
     var c = cfg();
-    if (c.sheetId) criarDashboard(SpreadsheetApp.openById(c.sheetId));
+    if (c.sheetId) atualizarTimestampDashboard(SpreadsheetApp.openById(c.sheetId));
   } catch (e) {
     Logger.log('Aviso: não foi possível atualizar Dashboard: ' + e.message);
   }
@@ -1154,7 +1173,7 @@ function processarMensagemMidia(msg, nomeContato, workspace, planilha) {
     getBytes:       function() { return blobFinal.getBytes(); }
   };
 
-  var tipo = tratarDocumentoWorkspace(anexoMock, nomeContato, 'WhatsApp: ' + nomeContato, workspace.pastaId, workspace.nome);
+  var tipo = tratarDocumentoWorkspace(anexoMock, nomeContato, 'WhatsApp: ' + nomeContato, workspace.pastaId, workspace.nome, planilha);
 
   // Registra ID da mensagem como processado — evita duplicatas em execuções futuras
   marcarMensagemProcessada(planilha, msg.id, nomeContato, workspace.nome, tipo);
@@ -1176,7 +1195,7 @@ function inferirMimeType(tipo) {
 // ============================================================
 // TRATAR DOCUMENTO WORKSPACE — pipeline completo com pasta de workspace
 // ============================================================
-function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWorkspace) {
+function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWorkspace, planilha) {
   var nomeOriginal = anexo.getName();
   var mimeType     = anexo.getContentType();
   Logger.log('[LiderHub] Tratando: ' + nomeOriginal + ' (' + mimeType + ')');
@@ -1201,7 +1220,7 @@ function tratarDocumentoWorkspace(anexo, nomeCliente, remetente, pastaId, nomeWo
   }
 
   var arquivo = salvarNoDriveWorkspace(blob, nomeCliente, pastaId);
-  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, nomeWorkspace, 'WhatsApp');
+  registrarNaPlanilha(nomeCliente, nomeFinal, tipo, arquivo.getUrl(), remetente, nomeWorkspace, 'WhatsApp', planilha);
   Logger.log('[LiderHub] Salvo: ' + arquivo.getName() + ' | ' + arquivo.getUrl());
   return tipo;
 }
