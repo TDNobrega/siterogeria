@@ -37,7 +37,7 @@ function cfg() {
     sheetId:          props.getProperty('SHEET_ID'),
     vercelProcessUrl: props.getProperty('VERCEL_PROCESS_URL'),
     vercelProcessKey: props.getProperty('VERCEL_PROCESS_KEY'),
-    alertEmail:       props.getProperty('ALERT_EMAIL') || 'intimacoes@rogeriaoliveira.com'
+    alertEmail:       props.getProperty('ALERT_EMAIL') || 'documentos@rogeriaoliveira.com'
   };
 }
 
