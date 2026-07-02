@@ -3,6 +3,7 @@ import Head from 'next/head'
 import dynamic from 'next/dynamic'
 import Layout from '../components/Layout'
 import Hero from '../components/Hero'
+import Reveal from '../components/Reveal'
 import { FIRM_NAME, FIRM_PHONE, FIRM_EMAIL, FIRM_CNPJ } from '../lib/constants'
 
 // Below-fold sections loaded lazily to reduce initial bundle
@@ -131,13 +132,13 @@ const Home: NextPage = () => {
 
       <Layout>
         <Hero />
-        <About />
-        <Services />
-        <Office />
-        <Testimonials />
-        <HowItWorks />
-        <CTASection />
-        <Contact />
+        <Reveal><About /></Reveal>
+        <Reveal><Services /></Reveal>
+        <Reveal><Office /></Reveal>
+        <Reveal><Testimonials /></Reveal>
+        <Reveal><HowItWorks /></Reveal>
+        <Reveal><CTASection /></Reveal>
+        <Reveal><Contact /></Reveal>
       </Layout>
     </>
   )

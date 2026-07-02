@@ -27,6 +27,16 @@
 /* ── Base Reset ──────────────────────────────────────────────────────────── */
 html { scroll-behavior: smooth; overflow-x: hidden; }
 
+/* Compensa a altura do Navbar fixo (h-20) ao navegar para uma âncora,
+   pra seção não ficar escondida atrás do menu. */
+#inicio, #sobre, #servicos, #escritorio, #como-funciona, #depoimentos, #contato {
+  scroll-margin-top: 5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
 body {
   font-family: 'Nunito Sans', 'DM Sans', system-ui, sans-serif;
   color: #1A1A1A;
@@ -138,5 +148,13 @@ body {
     @apply bg-white rounded-2xl border border-secondary/50
            shadow-card hover:shadow-card-hover hover:border-primary/40
            hover:-translate-y-0.5 transition-all duration-300;
+  }
+
+  /* ── Grain overlay (Hero) ────────────────────────────────────────────── */
+  /* Textura sutil de ruído via SVG turbulence — dá profundidade ao fundo
+     escuro do Hero sem precisar de nenhuma imagem/foto. */
+  .grain-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
   }
 }
