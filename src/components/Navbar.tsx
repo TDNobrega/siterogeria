@@ -7,7 +7,7 @@ const navLinks = [
   { href: '/#sobre',       label: 'Sobre' },
   { href: '/#servicos',    label: 'Serviços' },
   { href: '/professores',  label: 'Professores' },
-  { href: '/blog',         label: 'Blog' },
+  { href: '/blog',         label: 'Artigos e Notícias' },
   { href: '/#escritorio',  label: 'Escritório' },
   { href: '/#depoimentos', label: 'Depoimentos' },
   { href: '/#contato',     label: 'Contato' },

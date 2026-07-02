@@ -11,14 +11,14 @@ interface Props {
 const BlogIndex: NextPage<Props> = ({ posts }) => (
   <>
     <SeoHead
-      title="Blog | Rogéria Oliveira Advogada — Direito Previdenciário e do Servidor"
+      title="Artigos e Notícias | Rogéria Oliveira Advogada — Direito Previdenciário e do Servidor"
       description="Artigos sobre direitos de professores estaduais do RJ, aposentadoria, BPC/LOAS e direito previdenciário."
       url="https://rogeriaoliveira.com/blog"
     />
     <Layout>
       <section className="section-padding container-max">
-        <span className="eyebrow">Blog</span>
-        <h1 className="section-title mb-4">Artigos e orientações jurídicas</h1>
+        <span className="eyebrow">Artigos e Notícias</span>
+        <h1 className="section-title mb-4">Artigos e Notícias</h1>
         <p className="section-subtitle mb-12">
           Conteúdo escrito pela equipe da Dra. Rogéria Oliveira sobre direitos
           previdenciários e do servidor público.
