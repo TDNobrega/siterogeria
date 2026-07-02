@@ -21,8 +21,8 @@ export default function Office() {
           </p>
         </div>
 
-        {/* Grid — foto do escritório + vídeo da Dra. Rogéria */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Grid — foto do escritório + foto da Dra. Rogéria + vídeo */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
           {/* Foto do escritório */}
           <div className="relative overflow-hidden rounded-2xl group shadow-lg aspect-[3/4] bg-brand-light">
@@ -40,6 +40,25 @@ export default function Office() {
                             to-transparent opacity-0 group-hover:opacity-100 transition-opacity
                             duration-300 flex items-end p-6">
               <p className="text-white font-subtitle font-medium text-sm">Recepção e sala de espera — Rogéria Oliveira Advocacia</p>
+            </div>
+          </div>
+
+          {/* Foto da Dra. Rogéria no escritório */}
+          <div className="relative overflow-hidden rounded-2xl group shadow-lg aspect-[3/4] bg-brand-light">
+            <picture>
+              <source srcSet="/assets/office-2.webp" type="image/webp" />
+              <img
+                src="/assets/office-2.jpg"
+                alt="Dra. Rogéria Oliveira no escritório"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent
+                            to-transparent opacity-0 group-hover:opacity-100 transition-opacity
+                            duration-300 flex items-end p-6">
+              <p className="text-white font-subtitle font-medium text-sm">Dra. Rogéria Oliveira</p>
             </div>
           </div>
 

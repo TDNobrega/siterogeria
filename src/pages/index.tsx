@@ -8,6 +8,7 @@ import { FIRM_NAME, FIRM_PHONE, FIRM_EMAIL, FIRM_CNPJ } from '../lib/constants'
 // Below-fold sections loaded lazily to reduce initial bundle
 const About       = dynamic(() => import('../components/About'))
 const Services    = dynamic(() => import('../components/Services'))
+const TrustSection = dynamic(() => import('../components/TrustSection'))
 const Office      = dynamic(() => import('../components/Office'))
 const Testimonials = dynamic(() => import('../components/Testimonials'))
 const HowItWorks  = dynamic(() => import('../components/HowItWorks'))
@@ -133,6 +134,7 @@ const Home: NextPage = () => {
         <Hero />
         <About />
         <Services />
+        <TrustSection />
         <Office />
         <Testimonials />
         <HowItWorks />
