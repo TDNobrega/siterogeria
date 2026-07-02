@@ -1,9 +1,11 @@
 import type { Config } from 'tailwindcss'
+import typography from '@tailwindcss/typography'
 
 const config: Config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './content/**/*.mdx',
   ],
   theme: {
     extend: {
@@ -50,9 +52,28 @@ const config: Config = {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
+      typography: {
+        blog: {
+          css: {
+            '--tw-prose-body': 'theme(colors.ink)',
+            '--tw-prose-headings': 'theme(colors.ink)',
+            '--tw-prose-links': 'theme(colors.primary)',
+            '--tw-prose-bold': 'theme(colors.ink)',
+            '--tw-prose-quotes': 'theme(colors.muted)',
+            '--tw-prose-quote-borders': 'theme(colors.primary)',
+            '--tw-prose-bullets': 'theme(colors.secondary)',
+            '--tw-prose-hr': 'theme(colors.border)',
+            fontFamily: 'theme(fontFamily.body)',
+            h1: { fontFamily: 'theme(fontFamily.title)' },
+            h2: { fontFamily: 'theme(fontFamily.title)' },
+            h3: { fontFamily: 'theme(fontFamily.title)' },
+            a: { fontWeight: '600', textDecoration: 'none' },
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [typography],
 }
 
 export default config
