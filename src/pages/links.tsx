@@ -9,7 +9,7 @@ const GMB_REVIEW   = 'https://g.page/r/CT0bwIw2AmllEBM/review'
 
 const links = [
   {
-    label: 'Site: Direito Previdenciário',
+    label: 'Acesse nosso site',
     sublabel: 'INSS · BPC/LOAS · Aposentadoria',
     href: 'https://rogeriaoliveira.com',
     icon: '🌐',
