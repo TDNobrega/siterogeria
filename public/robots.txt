@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
 
+Disallow: /api/
+
 Sitemap: https://rogeriaoliveira.com/sitemap.xml

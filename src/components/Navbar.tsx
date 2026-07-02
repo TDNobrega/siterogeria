@@ -4,11 +4,13 @@ import Link from 'next/link'
 import { WHATSAPP_URL, FIRM_NAME } from '../lib/constants'
 
 const navLinks = [
-  { href: '#sobre',       label: 'Sobre' },
-  { href: '#servicos',    label: 'Serviços' },
-  { href: '#escritorio',  label: 'Escritório' },
-  { href: '#depoimentos', label: 'Depoimentos' },
-  { href: '#contato',     label: 'Contato' },
+  { href: '/#sobre',       label: 'Sobre' },
+  { href: '/#servicos',    label: 'Serviços' },
+  { href: '/professores',  label: 'Professores' },
+  { href: '/blog',         label: 'Blog' },
+  { href: '/#escritorio',  label: 'Escritório' },
+  { href: '/#depoimentos', label: 'Depoimentos' },
+  { href: '/#contato',     label: 'Contato' },
 ]
 
 export default function Navbar() {

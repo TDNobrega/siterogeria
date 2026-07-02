@@ -22,6 +22,33 @@ export default function Document() {
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <meta name="format-detection" content="telephone=no" />
+
+        {/* Schema global — advogada reconhecida em todas as páginas */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Attorney",
+              "name": "Rogéria Oliveira",
+              "url": "https://rogeriaoliveira.com",
+              "description": "Advogada especializada em Direito Previdenciário e Direitos do Servidor Público, com foco em professores estaduais do Rio de Janeiro.",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Estrada da Cachamorra, 350 - Bloco 3A, Sala 227",
+                "addressLocality": "Campo Grande",
+                "addressRegion": "RJ",
+                "addressCountry": "BR"
+              },
+              "telephone": "+55-21-96940-1414",
+              "memberOf": {
+                "@type": "Organization",
+                "name": "OAB/RJ",
+                "identifier": "239.339"
+              }
+            })
+          }}
+        />
       </Head>
       <body>
         <Main />
