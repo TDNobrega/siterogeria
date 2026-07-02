@@ -61,7 +61,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               className="btn-primary"
             >
-              Fale Conosco
+              Fale Comigo
             </a>
           </nav>
 
@@ -103,7 +103,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               className="btn-primary w-full"
             >
-              Fale Conosco
+              Fale Comigo
             </a>
           </div>
         </div>
