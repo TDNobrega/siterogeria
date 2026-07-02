@@ -50,7 +50,7 @@ export default function Hero() {
             className="btn-primary-lg w-full sm:w-auto"
           >
             <WhatsAppIcon />
-            Fale com um Advogado
+            Fale Conosco
           </a>
           <a
             href="#servicos"
