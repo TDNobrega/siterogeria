@@ -227,7 +227,7 @@ export default function Professores() {
           <section className="bg-ink text-white pt-10 pb-20 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="font-title font-bold text-3xl sm:text-4xl lg:text-5xl leading-[1.1] mb-6 text-white">
-                <span className="text-primary">Professores Estaduais do RJ:</span>
+                <span className="text-primary">Professores do RJ:</span>
                 <br />
                 <span className="text-primary">
                   Recupere seus Direitos e Garanta o Valor Real do seu Salário.
