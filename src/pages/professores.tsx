@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { FIRM_NAME, FIRM_CNPJ, FIRM_PHONE } from '../lib/constants'
 import { supabase } from '../lib/supabase'
 
-const WA_URL = 'https://wa.me/5521979522553?text=' + encodeURIComponent('Olá, gostaria de analisar meu contracheque.')
+const WA_URL = 'https://wa.me/5521983009815?text=' + encodeURIComponent('Olá, gostaria de analisar meu contracheque.')
 
 export default function Professores() {
   const [showExit, setShowExit] = useState(false)
@@ -66,13 +66,96 @@ export default function Professores() {
   return (
     <>
       <Head>
-        <title>Advogada para Professores RJ | Análise Gratuita do Contracheque</title>
-        <meta name="description" content="Professora ou professor do Estado do RJ? Identifique erros no piso salarial, triênios e Nova Escola. Análise jurídica gratuita do contracheque." />
-        <meta name="keywords" content="advogado professores RJ, direitos professor RJ, piso salarial professor RJ, Nova Escola professores, triênios professor RJ" />
-        <meta property="og:title" content="Análise Gratuita do Contracheque — Professores RJ" />
-        <meta property="og:description" content="9 em cada 10 contracheques de professores do RJ têm erros. Descubra o que você tem direito a receber." />
+        <title>Advogada para Professores Estaduais RJ | Direitos e Nova Escola | Campo Grande</title>
+        <meta name="description" content="Professora do Estado do RJ, você pode ter direito à Gratificação Nova Escola, triênios retroativos e revisão de aposentadoria. Análise gratuita do contracheque. Atendemos Campo Grande e todo o Rio de Janeiro." />
+        <meta name="keywords" content="advogada professores RJ, direitos professor RJ, piso salarial professor RJ, Nova Escola professores, triênios professor RJ, advogada magistério Campo Grande" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://rogeriaoliveira.com/professores" />
+        <meta property="og:title" content="Advogada para Professores do Estado do RJ | Nova Escola e Direitos" />
+        <meta property="og:description" content="9 em cada 10 contracheques de professores do RJ têm erros. Descubra o que você tem direito a receber. Atendemos Campo Grande e todo o Rio de Janeiro." />
+        <meta property="og:image" content="https://rogeriaoliveira.com/assets/attorney.jpg" />
+        <meta property="og:locale" content="pt_BR" />
+        <meta property="og:site_name" content="Rogéria Oliveira Advogada" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://rogeriaoliveira.com/professores" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LegalService",
+              "name": "Rogéria Oliveira Advogada",
+              "url": "https://rogeriaoliveira.com/professores",
+              "logo": "https://rogeriaoliveira.com/assets/logo.png",
+              "image": "https://rogeriaoliveira.com/assets/attorney.jpg",
+              "description": "Advogada especialista em direitos dos professores estaduais do Rio de Janeiro. Nova Escola, Piso Nacional, triênios, aposentadoria do magistério e planejamento previdenciário.",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Estrada da Cachamorra, 350 - Bloco 3A, Sala 227",
+                "addressLocality": "Campo Grande",
+                "addressRegion": "RJ",
+                "addressCountry": "BR"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": -22.9035,
+                "longitude": -43.5596
+              },
+              "telephone": "+55-21-96940-1414",
+              "email": "contato@rogeriaoliveira.com",
+              "areaServed": { "@type": "State", "name": "Rio de Janeiro" },
+              "priceRange": "Consulta gratuita",
+              "openingHours": "Mo-Fr 09:00-18:00",
+              "knowsAbout": [
+                "Gratificação Nova Escola RJ",
+                "Direito do Magistério",
+                "Aposentadoria de Professor Estadual",
+                "Piso Nacional do Magistério",
+                "Direito do Servidor Público RJ"
+              ],
+              "sameAs": [
+                "https://www.instagram.com/rogeriaoliveira.advogada",
+                "https://www.instagram.com/rogeriaoliveiraadvocacia"
+              ]
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "O que é a Gratificação Nova Escola para professores do RJ?",
+                  "acceptedAnswer": { "@type": "Answer", "text": "A Nova Escola é uma ação civil pública movida pelo SEPE que garante o pagamento de valores suspensos indevidamente pelo Estado do Rio de Janeiro para profissionais da educação. Se você trabalhou na rede estadual em 2002/2003, pode ter direito a receber essas diferenças com correção monetária por meio de ação judicial." }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Quanto tempo leva para receber os valores retroativos?",
+                  "acceptedAnswer": { "@type": "Answer", "text": "Depende do caso. Ações administrativas podem resolver em 3 a 6 meses. Ações judiciais podem levar de 1 a 2 anos, mas os valores retroativos são calculados desde o início do erro — o que pode representar uma indenização significativa." }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Preciso ir ao escritório pessoalmente?",
+                  "acceptedAnswer": { "@type": "Answer", "text": "Não. Atendemos 100% de forma remota pelo WhatsApp e e-mail. Você nos envia os documentos digitalizados e cuidamos de todo o processo. Professores de qualquer cidade do Rio de Janeiro podem nos contratar." }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Quanto custa a análise do contracheque?",
+                  "acceptedAnswer": { "@type": "Answer", "text": "A análise inicial é totalmente gratuita. Só cobramos honorários se e quando você ganhar — e o valor é combinado de forma transparente antes de iniciarmos qualquer ação." }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Já estou aposentado, ainda tenho direito?",
+                  "acceptedAnswer": { "@type": "Answer", "text": "Sim. Professores aposentados e pensionistas também têm direito a revisão de benefícios. Erros cometidos antes da aposentadoria podem gerar valores retroativos mesmo após a concessão do benefício." }
+                }
+              ]
+            })
+          }}
+        />
       </Head>
 
       {/* Exit Intent Popup */}
@@ -144,7 +227,7 @@ export default function Professores() {
           <section className="bg-ink text-white pt-10 pb-20 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="font-title font-bold text-3xl sm:text-4xl lg:text-5xl leading-[1.1] mb-6 text-white">
-                <span className="text-primary">Professor Estadual do RJ:</span>
+                <span className="text-primary">Advogada para Professores Estaduais do RJ:</span>
                 <br />
                 <span className="text-primary">
                   Recupere seus Direitos e Garanta o Valor Real do seu Salário.
@@ -153,7 +236,8 @@ export default function Professores() {
 
               <p className="font-body text-white/75 text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
                 Identificamos erros frequentes no cálculo do Piso Nacional, triênios congelados
-                e verbas nunca pagas. Recupere valores que o Estado deixou de depositar.
+                e verbas nunca pagas em Campo Grande e em todo o Rio de Janeiro. Recupere valores
+                que o Estado deixou de depositar.
               </p>
 
               <a href="#formulario"
@@ -302,9 +386,10 @@ export default function Professores() {
                   </h2>
                   <p className="font-body text-muted text-base leading-relaxed mb-6">
                     Professoras e professores têm regras especiais de aposentadoria —
-                    mas poucos sabem como aproveitá-las. Entender seu tempo de contribuição,
-                    as regras de transição e os benefícios do magistério pode fazer a diferença
-                    de anos na sua aposentadoria.
+                    mas poucos sabem como aproveitá-las. Isso inclui tanto o INSS quanto o
+                    RPPS (previdência própria dos servidores do Estado do Rio de Janeiro).
+                    Entender seu tempo de contribuição, as regras de transição e os benefícios
+                    do magistério pode fazer a diferença de anos na sua aposentadoria.
                   </p>
                   <ul className="space-y-3 mb-8 mx-auto lg:mx-0 w-fit">
                     {[
@@ -539,7 +624,7 @@ export default function Professores() {
                   {
                     icon: '📱',
                     title: 'Atendimento Remoto',
-                    desc: 'Atendemos professores de todo o RJ sem que você precise sair de casa. Tudo pelo WhatsApp e e-mail.',
+                    desc: 'Atendemos professores de Campo Grande e de todo o Rio de Janeiro sem que você precise sair de casa. Tudo pelo WhatsApp e e-mail.',
                   },
                 ].map(item => (
                   <div key={item.title}
@@ -568,6 +653,10 @@ export default function Professores() {
               </div>
               <div className="space-y-4">
                 {[
+                  {
+                    q: 'O que é a Gratificação Nova Escola para professores do RJ?',
+                    a: 'A Nova Escola é uma ação civil pública movida pelo SEPE que garante o pagamento de valores suspensos indevidamente pelo Estado do Rio de Janeiro. Se você trabalhou na rede estadual em 2002/2003, pode ter direito a receber essas diferenças com correção monetária por meio de ação judicial — mesmo que já esteja aposentado.',
+                  },
                   {
                     q: 'Quanto tempo leva para receber os valores retroativos?',
                     a: 'Depende do caso. Ações administrativas podem resolver em 3 a 6 meses. Ações judiciais podem levar de 1 a 2 anos, mas os valores retroativos são calculados desde o início do erro — o que pode representar uma indenização significativa.',
@@ -620,7 +709,7 @@ export default function Professores() {
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
                     <path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.554 4.118 1.523 5.851L.057 23.057a.75.75 0 00.886.886l5.206-1.466A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.706 9.706 0 01-4.952-1.357l-.355-.21-3.678 1.036 1.036-3.678-.21-.355A9.706 9.706 0 012.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75z" />
                   </svg>
-                  (21) 97952-2553
+                  (21) 98300-9815
                 </a>
                 <a href="/" className="font-subtitle text-white/70 hover:text-white transition-colors">
                   Site Principal
@@ -653,6 +742,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 p-6 text-left
                    hover:bg-brand-light transition-colors"
+        aria-expanded={open}
       >
         <span className="font-subtitle font-semibold text-ink text-sm sm:text-base pr-2">
           {question}
@@ -664,11 +754,9 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      {open && (
-        <div className="px-6 pb-6">
-          <p className="font-body text-muted text-sm leading-relaxed">{answer}</p>
-        </div>
-      )}
+      <div className={`px-6 overflow-hidden transition-all duration-300 ${open ? 'max-h-96 pb-6' : 'max-h-0'}`}>
+        <p className="font-body text-muted text-sm leading-relaxed">{answer}</p>
+      </div>
     </div>
   )
 }

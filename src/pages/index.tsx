@@ -84,7 +84,7 @@ const Home: NextPage = () => {
                 streetAddress: 'Estrada da Cachamorra, 350 - Bloco 3A, Sala 227',
                 addressLocality: 'Campo Grande',
                 addressRegion: 'RJ',
-                postalCode: '23080-000',
+                postalCode: '23040-150',
                 addressCountry: 'BR',
               },
               geo: {
@@ -120,6 +120,10 @@ const Home: NextPage = () => {
                 ratingValue: '5.0',
                 reviewCount: '47',
               },
+              sameAs: [
+                'https://www.instagram.com/rogeriaoliveiraadvocacia',
+                'https://www.instagram.com/rogeriaoliveira.advogada',
+              ],
             }),
           }}
         />

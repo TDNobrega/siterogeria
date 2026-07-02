@@ -20,12 +20,11 @@ export default function Hero() {
         <h1 className="font-title font-bold text-white leading-[1.1]
                        text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem]
                        max-w-4xl mx-auto mb-6 animate-fade-up">
-          Advocacia Especializada em{' '}
-          <span className="text-secondary">Direito Previdenciário (RPPS e RGPS)</span>
-          {', '}
-          <span className="text-secondary">Direito Trabalhista</span>{' '}
-          e Direito dos{' '}
-          <span className="text-secondary">Servidores Públicos</span>
+          Advocacia Especializada para{' '}
+          <span className="text-secondary">Servidores Públicos</span>{' '}
+          e{' '}
+          <span className="text-secondary">Direito Previdenciário</span>{' '}
+          em Campo Grande, RJ
         </h1>
 
         {/* Divider */}
