@@ -60,7 +60,7 @@ export default function Contact() {
         <div className="text-center mb-14">
           <p className="eyebrow justify-center">Entre em Contato</p>
           <h2 className="section-title mb-4">
-            Fale <span className="text-primary">Conosco</span>
+            Fale <span className="text-primary">Comigo</span>
           </h2>
           <div className="divider mx-auto mb-6" />
           <p className="section-subtitle max-w-2xl mx-auto">

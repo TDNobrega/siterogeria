@@ -38,7 +38,7 @@ export default function CTASection() {
                        shadow-[0_2px_12px_0_rgba(0,0,0,0.15)]"
           >
             <WhatsAppIcon />
-            Falar com Advogado Agora
+            Fale Comigo
           </a>
         </div>
 
