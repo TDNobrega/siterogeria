@@ -16,13 +16,6 @@ const links = [
     variant: 'primary',
   },
   {
-    label: 'Site: Professores Estaduais RJ',
-    sublabel: 'Nova Escola · Triênios · Contracheque',
-    href: 'https://rogeriaoliveira.com/professores',
-    icon: '🎓',
-    variant: 'primary',
-  },
-  {
     label: 'WhatsApp: Atendimento Direito Previdenciário',
     sublabel: '(21) 96974-2080',
     href: WA_GERAL,
@@ -30,7 +23,7 @@ const links = [
     variant: 'whatsapp',
   },
   {
-    label: 'WhatsApp: Atendimento Professores RJ',
+    label: 'WhatsApp: Atendimento Professores/Servidores',
     sublabel: '(21) 98300-9815 · Análise do contracheque',
     href: WA_PROF,
     icon: '📋',
