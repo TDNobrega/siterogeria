@@ -4,7 +4,7 @@
  */
 import sharp from 'sharp'
 import { existsSync, mkdirSync } from 'fs'
-import { join, dirname } from 'path'
+import { join, dirname, basename } from 'path'
 import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -59,6 +59,22 @@ const jobs = [
       formatOptions: { quality: 85, mozjpeg: true },
     },
   ]),
+  // Hero background — colunas clássicas (Patrick Fore / Unsplash License,
+  // uso livre e comercial) — 1920px wide, WebP + JPEG
+  {
+    input: join(ASSETS, 'hero-columns.jpg'),
+    output: join(ASSETS, 'hero-columns.webp'),
+    options: { width: 1920, withoutEnlargement: true },
+    format: 'webp',
+    formatOptions: { quality: 82, effort: 6 },
+  },
+  {
+    input: join(ASSETS, 'hero-columns.jpg'),
+    output: join(ASSETS, 'hero-columns.jpg'),
+    options: { width: 1920, withoutEnlargement: true },
+    format: 'jpeg',
+    formatOptions: { quality: 85, mozjpeg: true },
+  },
 ]
 
 let saved = 0
@@ -79,7 +95,7 @@ for (const job of jobs) {
 
     const diff = Math.round((1 - after / before) * 100)
     saved += before - after
-    console.log(`✓ ${job.output.split('/assets/')[1].padEnd(20)} ${kb(before)} → ${kb(after)}  (${diff > 0 ? '-' : '+'}${Math.abs(diff)}%)`)
+    console.log(`✓ ${basename(job.output).padEnd(20)} ${kb(before)} → ${kb(after)}  (${diff > 0 ? '-' : '+'}${Math.abs(diff)}%)`)
   } catch (e) {
     console.error(`✗ ${job.input}: ${e.message}`)
   }

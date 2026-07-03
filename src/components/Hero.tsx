@@ -6,39 +6,35 @@ export default function Hero() {
       id="inicio"
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ink"
     >
-      {/* ── Fundo temático (100% CSS/SVG, sem foto) ──────────────────────── */}
-
-      {/* Colunas — linhas verticais finas evocando arquitetura de tribunal,
-          "emergindo" da base e se dissolvendo em direção ao topo */}
-      <div
-        className="absolute inset-x-0 bottom-0 h-2/3 opacity-40"
-        style={{
-          backgroundImage:
-            'repeating-linear-gradient(90deg, rgba(197,151,58,0.35) 0px, rgba(197,151,58,0.35) 2px, transparent 2px, transparent 44px)',
-          maskImage: 'linear-gradient(to top, black, transparent)',
-          WebkitMaskImage: 'linear-gradient(to top, black, transparent)',
-        }}
-      />
+      {/* ── Fundo — colunas clássicas (foto), tratamento escuro/dourado ──── */}
+      {/* Foto: Patrick Fore / Unsplash License (uso livre e comercial) */}
+      <picture>
+        <source srcSet="/assets/hero-columns.webp" type="image/webp" />
+        <img
+          src="/assets/hero-columns.jpg"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+        />
+      </picture>
 
       {/* Brilho dourado suave atrás do título */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 60% 45% at 50% 8%, rgba(197,151,58,0.28), transparent 70%)',
+            'radial-gradient(ellipse 60% 45% at 50% 8%, rgba(197,151,58,0.30), transparent 70%)',
         }}
       />
 
-      {/* Balança da justiça — silhueta grande e discreta, só decorativa */}
-      <ScalesMotif className="absolute -right-16 top-1/2 -translate-y-1/2
-                              w-[420px] h-[420px] lg:w-[560px] lg:h-[560px]
-                              text-primary opacity-[0.08] pointer-events-none" />
+      {/* Textura de grão — reforça a profundidade sobre a foto */}
+      <div className="absolute inset-0 grain-overlay opacity-[0.05] pointer-events-none" />
 
-      {/* Textura de grão — profundidade sem precisar de imagem real */}
-      <div className="absolute inset-0 grain-overlay opacity-[0.06] pointer-events-none" />
-
-      {/* Overlay — escurece tudo de novo pra manter contraste do texto */}
-      <div className="absolute inset-0 bg-ink/60" />
+      {/* Overlay — escurece a foto pra manter contraste do texto */}
+      <div className="absolute inset-0 bg-ink/75" />
       <div className="absolute inset-0 bg-primary/10" />
 
       <div className="relative z-10 container-max mx-auto px-4 sm:px-6 lg:px-8
@@ -112,43 +108,6 @@ export default function Hero() {
       <div className="absolute bottom-0 left-0 right-0 h-24
                       bg-gradient-to-t from-white to-transparent" />
     </section>
-  )
-}
-
-/** Balança da justiça — line-art minimalista, só decorativa (não é um ícone de UI). */
-function ScalesMotif({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 200 200"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.25}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {/* Poste central */}
-      <line x1="100" y1="18" x2="100" y2="168" />
-      {/* Finial */}
-      <circle cx="100" cy="12" r="5" />
-      {/* Trave horizontal */}
-      <line x1="34" y1="40" x2="166" y2="40" />
-      {/* Base / pedestal */}
-      <line x1="66" y1="168" x2="134" y2="168" />
-      <line x1="76" y1="180" x2="124" y2="180" />
-      <line x1="100" y1="168" x2="100" y2="180" />
-
-      {/* Prato esquerdo */}
-      <line x1="34" y1="40" x2="20" y2="84" />
-      <line x1="34" y1="40" x2="48" y2="84" />
-      <path d="M14 84 a20 14 0 0 0 40 0" />
-
-      {/* Prato direito */}
-      <line x1="166" y1="40" x2="152" y2="84" />
-      <line x1="166" y1="40" x2="180" y2="84" />
-      <path d="M146 84 a20 14 0 0 0 40 0" />
-    </svg>
   )
 }
 
