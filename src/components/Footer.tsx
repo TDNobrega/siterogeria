@@ -37,15 +37,15 @@ export default function Footer() {
       <div className="container-max mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
 
-          {/* ── Col 1: Brand ── */}
+          {/* ── Col 1: Brand — banner dourado da marca ── */}
           <div className="lg:col-span-1">
-            <div className="relative h-14 w-44 mb-5">
+            <div className="relative h-16 w-56 mb-5">
               <Image
-                src="/assets/logo.png"
-                alt={FIRM_NAME}
+                src="/assets/banner-logo.png"
+                alt="Rogéria Oliveira Advocacia"
                 fill
-                sizes="(max-width: 768px) 160px, 176px"
-                className="object-contain object-left brightness-0 invert"
+                sizes="(max-width: 768px) 200px, 224px"
+                className="object-contain object-left"
               />
             </div>
             <p className="font-body text-gray-400 text-sm leading-relaxed mb-6">
@@ -65,7 +65,7 @@ export default function Footer() {
 
           {/* ── Col 2: Navigation ── */}
           <div>
-            <h4 className="font-title font-bold text-white text-lg mb-5 relative
+            <h4 className="font-title font-semibold text-secondary text-xl mb-5 relative
                            after:content-[''] after:absolute after:-bottom-2 after:left-0
                            after:w-8 after:h-0.5 after:bg-primary">
               Navegação
@@ -89,7 +89,7 @@ export default function Footer() {
 
           {/* ── Col 3: Services ── */}
           <div>
-            <h4 className="font-title font-bold text-white text-lg mb-5 relative
+            <h4 className="font-title font-semibold text-secondary text-xl mb-5 relative
                            after:content-[''] after:absolute after:-bottom-2 after:left-0
                            after:w-8 after:h-0.5 after:bg-primary">
               Serviços
@@ -113,7 +113,7 @@ export default function Footer() {
 
           {/* ── Col 4: Contact ── */}
           <div>
-            <h4 className="font-title font-bold text-white text-lg mb-5 relative
+            <h4 className="font-title font-semibold text-secondary text-xl mb-5 relative
                            after:content-[''] after:absolute after:-bottom-2 after:left-0
                            after:w-8 after:h-0.5 after:bg-primary">
               Contato

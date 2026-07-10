@@ -12,7 +12,6 @@ const Services    = dynamic(() => import('../components/Services'))
 const Office      = dynamic(() => import('../components/Office'))
 const Testimonials = dynamic(() => import('../components/Testimonials'))
 const HowItWorks  = dynamic(() => import('../components/HowItWorks'))
-const CTASection  = dynamic(() => import('../components/CTASection'))
 const Contact     = dynamic(() => import('../components/Contact'))
 
 const SEO = {
@@ -138,7 +137,6 @@ const Home: NextPage = () => {
         <Reveal><Office /></Reveal>
         <Reveal><Testimonials /></Reveal>
         <Reveal><HowItWorks /></Reveal>
-        <Reveal><CTASection /></Reveal>
         <Reveal><Contact /></Reveal>
       </Layout>
     </>
