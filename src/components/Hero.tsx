@@ -105,7 +105,6 @@ export default function Hero() {
                         gap-x-3 gap-y-2 animate-fade-up">
           {[
             'OAB/RJ 239.339',
-            'Primeira consulta gratuita',
             'Atendimento presencial e online',
           ].map((item, i) => (
             <span key={item} className="flex items-center gap-3">

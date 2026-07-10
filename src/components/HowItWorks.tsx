@@ -6,7 +6,7 @@ const steps = [
     title: 'Contato Inicial',
     description:
       'Entre em contato pelo WhatsApp ou formulário. Nossa equipe responde rapidamente para entender sua situação e agendar uma conversa.',
-    highlight: 'Gratuito e sem compromisso',
+    highlight: 'Sem compromisso',
   },
   {
     number: '02',

@@ -134,7 +134,7 @@ export default function About() {
 
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer"
               className="btn-primary mx-auto lg:mx-0">
-              Agendar Consulta Gratuita
+              Fale Comigo
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2}
                 viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />

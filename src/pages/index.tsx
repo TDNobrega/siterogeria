@@ -18,7 +18,7 @@ const Contact     = dynamic(() => import('../components/Contact'))
 const SEO = {
   title: 'Rogéria Oliveira Advogada | Direito Previdenciário (INSS) e Direitos do Servidor Público – Campo Grande, RJ',
   description:
-    'Advogada especializada em Direito Previdenciário e Direitos do Servidor Público em Campo Grande, Rio de Janeiro. INSS negado, aposentadoria, BPC/LOAS, descontos indevidos no contracheque. Consulta gratuita.',
+    'Advogada especializada em Direito Previdenciário e Direitos do Servidor Público em Campo Grande, Rio de Janeiro. INSS negado, aposentadoria, BPC/LOAS, descontos indevidos no contracheque.',
   keywords:
     'advogada servidor público campo grande rj, direito previdenciário rio de janeiro, INSS negado rio de janeiro, aposentadoria servidor público, BPC LOAS rio de janeiro, descontos indevidos servidor público, advocacia campo grande, rogéria oliveira advogada',
   url: 'https://rogeriaoliveira.com',

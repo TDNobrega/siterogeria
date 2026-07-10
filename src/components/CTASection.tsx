@@ -5,13 +5,6 @@ export default function CTASection() {
     <section className="bg-ink py-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto text-center">
 
-        {/* Badge */}
-        <span className="inline-block bg-white/20 text-white
-                         text-sm font-subtitle font-semibold tracking-widest uppercase
-                         px-5 py-2 rounded-full border border-white/30 mb-8">
-          Primeira Consulta Gratuita
-        </span>
-
         {/* Headline */}
         <h2 className="font-title text-4xl sm:text-5xl font-bold text-white
                        leading-tight mb-6">
@@ -45,7 +38,6 @@ export default function CTASection() {
         {/* Trust badges — separados por pontos dourados, sem caracteres soltos */}
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
           {[
-            'Consulta Gratuita',
             'Atendimento Online e Presencial',
             'Sigilo Garantido',
             'Sem Burocracia',
