@@ -2,17 +2,15 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
 import Layout from '../components/Layout'
-import Hero from '../components/Hero'
+import About from '../components/About'
 import Reveal from '../components/Reveal'
 import { FIRM_NAME, FIRM_PHONE, FIRM_EMAIL, FIRM_CNPJ } from '../lib/constants'
 
 // Below-fold sections loaded lazily to reduce initial bundle
-const About       = dynamic(() => import('../components/About'))
 const Services    = dynamic(() => import('../components/Services'))
 const Office      = dynamic(() => import('../components/Office'))
 const Testimonials = dynamic(() => import('../components/Testimonials'))
 const HowItWorks  = dynamic(() => import('../components/HowItWorks'))
-const Contact     = dynamic(() => import('../components/Contact'))
 
 const SEO = {
   title: 'Rogéria Oliveira Advogada | Direito Previdenciário (INSS) e Direitos do Servidor Público – Campo Grande, RJ',
@@ -60,8 +58,8 @@ const Home: NextPage = () => {
         <meta name="twitter:image" content={`${SEO.url}${SEO.image}`} />
         <meta name="twitter:image:alt" content="Rogéria Oliveira Advogada — Campo Grande, RJ" />
 
-        {/* Performance — preload LCP images do Hero */}
-        <link rel="preload" as="image" href="/assets/banner-logo-dark.webp" type="image/webp" fetchPriority="high" />
+        {/* Performance — preload LCP image (foto da Dra. Rogéria, agora primeira seção) */}
+        <link rel="preload" as="image" href="/assets/attorney.webp" type="image/webp" fetchPriority="high" />
 
         {/* Sitemap reference */}
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
@@ -130,13 +128,11 @@ const Home: NextPage = () => {
       </Head>
 
       <Layout>
-        <Hero />
-        <Reveal><About /></Reveal>
+        <About />
         <Reveal><Services /></Reveal>
         <Reveal><Office /></Reveal>
         <Reveal><Testimonials /></Reveal>
         <Reveal><HowItWorks /></Reveal>
-        <Reveal><Contact /></Reveal>
       </Layout>
     </>
   )

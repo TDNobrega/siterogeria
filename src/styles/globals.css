@@ -29,7 +29,7 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
 
 /* Compensa a altura do Navbar fixo (h-20) ao navegar para uma âncora,
    pra seção não ficar escondida atrás do menu. */
-#inicio, #sobre, #servicos, #escritorio, #como-funciona, #depoimentos, #contato {
+#inicio, #sobre, #servicos, #escritorio, #como-funciona, #depoimentos {
   scroll-margin-top: 5rem;
 }
 

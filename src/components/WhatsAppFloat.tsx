@@ -27,7 +27,7 @@ export default function WhatsAppFloat() {
       <span className="hidden sm:block bg-ink text-white font-subtitle font-semibold text-sm
                        px-4 py-2 rounded-xl shadow-lg opacity-0 group-hover:opacity-100
                        transition-opacity duration-200 whitespace-nowrap">
-        Fale com um advogado
+        Fale com a advogada
       </span>
 
       {/* Button */}

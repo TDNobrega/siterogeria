@@ -91,29 +91,35 @@ export default function About() {
             <p className="eyebrow justify-center lg:justify-start">Sobre o Escritório</p>
 
             <h2 className="section-title mb-4">
-              Advocacia com{' '}
-              <span className="text-primary">Propósito</span>{' '}
-              e Resultado
+              Advocacia especializada em{' '}
+              <span className="text-primary">Direito Previdenciário</span>{' '}
+              e na defesa de{' '}
+              <span className="text-primary">Servidores Públicos</span>
             </h2>
 
             <div className="divider mb-8 mx-auto lg:mx-0" />
 
             <div className="space-y-4 font-body text-muted text-base leading-relaxed">
               <p>
-                Somos um escritório de advocacia com atuação nacional, especializado
-                nas complexidades que envolvem o{' '}
-                <strong className="text-ink font-semibold">Servidor Público</strong> e o{' '}
-                <strong className="text-ink font-semibold">Trabalhador da iniciativa privada</strong>.
-                Nossa missão é clara: garantir que cada cliente receba uma defesa personalizada,
-                transparente e rigorosamente focada em resultados.
+                Quem dedica a vida à sala de aula ou ao serviço público constrói, ano após
+                ano, um direito que é seu por justiça. No Rogéria Oliveira Advocacia,
+                entendemos o que está por trás de cada gratificação, cada tempo de
+                contribuição, cada benefício: uma carreira de esforço que não pode ser
+                diluída por um desconto indevido, uma negativa do INSS ou uma regra mal
+                aplicada.
               </p>
               <p>
-                Com uma trajetória sólida em{' '}
-                <strong className="text-ink font-semibold">Direito Previdenciário (RPPS e RGPS)</strong> e{' '}
-                <strong className="text-ink font-semibold">Trabalhista</strong>, dominamos as nuances
-                que separam um benefício negado de uma aposentadoria justa. Seja na recuperação de
-                descontos indevidos, na correção de injustiças contratuais ou na viabilização de
-                benefícios junto ao INSS, estamos prontos para proteger o seu patrimônio e o seu futuro.
+                Atuamos lado a lado com professores da rede pública, com ações
+                previdenciárias contra o Estado (RPPS), municípios e fundos de previdência,
+                revisão de gratificações e descontos em contracheque; e com professores da
+                rede privada, vinculados ao INSS, em aposentadoria, aposentadoria especial,
+                auxílio-doença e direitos trabalhistas como verbas rescisórias. Também
+                atendemos servidores públicos de outras carreiras e segurados do INSS em
+                geral.
+              </p>
+              <p>
+                Nosso trabalho é simples de descrever e sério de executar: assegurar que o
+                que você construiu ao longo da carreira continue sendo seu.
               </p>
             </div>
 

@@ -16,7 +16,6 @@ const navLinks = [
   { href: '#escritorio', label: 'Nosso Escritório' },
   { href: '#depoimentos', label: 'Depoimentos' },
   { href: '#como-funciona', label: 'Como Funciona' },
-  { href: '#contato', label: 'Contato' },
 ]
 
 const services = [

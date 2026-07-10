@@ -10,7 +10,6 @@ const navLinks = [
   { href: '/blog',         label: 'Artigos e Notícias' },
   { href: '/#escritorio',  label: 'Escritório' },
   { href: '/#depoimentos', label: 'Depoimentos' },
-  { href: '/#contato',     label: 'Contato' },
 ]
 
 // Consultas processuais e portais OAB — abrem em nova aba
