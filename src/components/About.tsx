@@ -47,6 +47,18 @@ export default function About() {
   return (
     <section id="sobre" className="section-padding bg-white">
       <div className="container-max mx-auto">
+
+        {/* ── Título — cobre toda a largura, acima da foto e do texto ── */}
+        <div className="text-center mb-14">
+          <h2 className="section-title mb-4">
+            Advocacia especializada em{' '}
+            <span className="text-primary">Direito Previdenciário</span>{' '}
+            e na defesa de{' '}
+            <span className="text-primary">Servidores Públicos</span>
+          </h2>
+          <div className="divider mx-auto" />
+        </div>
+
         <div className="grid lg:grid-cols-2 gap-16 items-center">
 
           {/* ── Left: Photo + stats ── */}
@@ -88,17 +100,6 @@ export default function About() {
 
           {/* ── Right: Text ── */}
           <div className="mt-10 lg:mt-0 text-center lg:text-left">
-            <p className="eyebrow justify-center lg:justify-start">Sobre o Escritório</p>
-
-            <h2 className="section-title mb-4">
-              Advocacia especializada em{' '}
-              <span className="text-primary">Direito Previdenciário</span>{' '}
-              e na defesa de{' '}
-              <span className="text-primary">Servidores Públicos</span>
-            </h2>
-
-            <div className="divider mb-8 mx-auto lg:mx-0" />
-
             <div className="space-y-4 font-body text-muted text-base leading-relaxed">
               <p>
                 Quem dedica a vida à sala de aula ou ao serviço público constrói, ano após
