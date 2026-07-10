@@ -36,9 +36,6 @@ export default function Hero() {
           <em className="not-italic text-support">Direito Previdenciário</em>{' '}
           e na defesa de{' '}
           <em className="not-italic text-support">Servidores Públicos</em>
-          <span className="block mt-2 text-lg sm:text-xl text-ink/60 font-title italic">
-            Campo Grande · Rio de Janeiro · Atendimento em todo o Brasil
-          </span>
         </h1>
 
         {/* Apresentação do escritório */}
@@ -53,14 +50,14 @@ export default function Hero() {
         <div className="mt-4 flex flex-wrap items-center justify-center
                         gap-x-3 gap-y-2 animate-fade-up">
           {[
-            'Atendimento presencial e online',
-            'Atuação em todo o Brasil',
+            'Campo Grande · Rio de Janeiro',
+            'Atendimento presencial e online em todo o Brasil',
           ].map((item, i) => (
             <span key={item} className="flex items-center gap-3">
               {i > 0 && (
                 <span className="hidden sm:block w-1 h-1 rounded-full bg-support/60" />
               )}
-              <span className="font-subtitle text-xs tracking-[0.18em] uppercase text-support/90">
+              <span className="font-subtitle text-[10px] tracking-[0.16em] uppercase text-support/90">
                 {item}
               </span>
             </span>
