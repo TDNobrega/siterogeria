@@ -64,7 +64,7 @@ export default function Contact() {
           </h2>
           <div className="divider mx-auto mb-6" />
           <p className="section-subtitle max-w-2xl mx-auto">
-            Estamos prontos para ouvir seu caso. O primeiro atendimento é sempre gratuito.
+            Estamos prontos para ouvir o seu caso e responder com agilidade.
           </p>
         </div>
 
