@@ -2,14 +2,14 @@ export default function Hero() {
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ink"
+      className="relative min-h-[62vh] flex items-center justify-center overflow-hidden bg-ink"
     >
-      {/* ── Fundo — biblioteca jurídica clássica, tratamento escuro/dourado ── */}
-      {/* Foto: Iñaki del Olmo / Unsplash License (uso livre e comercial) */}
+      {/* ── Fundo — textura escura lisa, clean, com luz suave ─────────────── */}
+      {/* Foto: Unsplash License (uso livre e comercial) */}
       <picture>
-        <source srcSet="/assets/hero-bg.webp" type="image/webp" />
+        <source srcSet="/assets/hero-bg2.webp" type="image/webp" />
         <img
-          src="/assets/hero-bg.jpg"
+          src="/assets/hero-bg2.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover"
@@ -19,8 +19,8 @@ export default function Hero() {
         />
       </picture>
 
-      {/* Overlay — escurece a foto pra manter contraste do texto e do banner */}
-      <div className="absolute inset-0 bg-ink/80" />
+      {/* Overlay leve — a textura já é escura, só uniformiza o contraste */}
+      <div className="absolute inset-0 bg-ink/40" />
 
       {/* Brilho dourado suave atrás do banner */}
       <div
@@ -35,7 +35,7 @@ export default function Hero() {
       <div className="absolute inset-0 grain-overlay opacity-[0.05] pointer-events-none" />
 
       <div className="relative z-10 container-max mx-auto px-4 sm:px-6 lg:px-8
-                      text-center py-24">
+                      text-center pt-32 pb-16">
 
         {/* ── Banner da marca — PNG transparente, só a arte dourada ────────── */}
         <picture>
@@ -43,7 +43,7 @@ export default function Hero() {
           <img
             src="/assets/banner-logo.png"
             alt="Rogéria Oliveira Advocacia"
-            className="mx-auto w-full max-w-md sm:max-w-lg lg:max-w-xl animate-fade-up
+            className="mx-auto w-full max-w-sm sm:max-w-md lg:max-w-lg animate-fade-up
                        drop-shadow-[0_2px_24px_rgba(0,0,0,0.55)]"
             loading="eager"
             fetchPriority="high"
@@ -52,7 +52,7 @@ export default function Hero() {
         </picture>
 
         {/* Filete dourado */}
-        <div className="mt-10 mb-8 flex items-center justify-center gap-4">
+        <div className="mt-7 mb-6 flex items-center justify-center gap-4">
           <span className="block w-16 h-px bg-gradient-to-r from-transparent to-primary/70" />
           <span className="block w-1.5 h-1.5 rotate-45 border border-primary/80" />
           <span className="block w-16 h-px bg-gradient-to-l from-transparent to-primary/70" />
@@ -73,7 +73,7 @@ export default function Hero() {
 
         {/* Apresentação do escritório */}
         <p className="font-body text-white/75 text-base sm:text-lg
-                      max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-up">
+                      max-w-2xl mx-auto mb-8 leading-relaxed animate-fade-up">
           Um escritório dedicado a proteger o que você construiu: aposentadorias,
           benefícios do INSS e direitos do servidor, conduzidos com escuta atenta,
           técnica e transparência do início ao fim.
