@@ -42,17 +42,21 @@ export default function CTASection() {
           </a>
         </div>
 
-        {/* Trust badges */}
-        <div className="flex flex-wrap items-center justify-center gap-6">
+        {/* Trust badges — separados por pontos dourados, sem caracteres soltos */}
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
           {[
-            '✓ Consulta Gratuita',
-            '✓ Atendimento Online e Presencial',
-            '✓ Sigilo Garantido',
-            '✓ Sem Burocracia',
-          ].map((badge) => (
-            <span key={badge}
-              className="font-subtitle text-sm text-white/70 font-medium">
-              {badge}
+            'Consulta Gratuita',
+            'Atendimento Online e Presencial',
+            'Sigilo Garantido',
+            'Sem Burocracia',
+          ].map((badge, i) => (
+            <span key={badge} className="flex items-center gap-3">
+              {i > 0 && (
+                <span className="hidden sm:block w-1 h-1 rounded-full bg-primary/70" />
+              )}
+              <span className="font-subtitle text-xs tracking-[0.15em] uppercase text-white/60">
+                {badge}
+              </span>
             </span>
           ))}
         </div>

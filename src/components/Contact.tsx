@@ -179,9 +179,12 @@ export default function Contact() {
             <div className="card bg-white p-8 h-full">
               {submitted ? (
                 <div className="flex flex-col items-center justify-center h-full text-center py-16">
-                  <div className="w-20 h-20 rounded-full bg-brand-light flex items-center
-                                  justify-center text-4xl mb-6">
-                    ✅
+                  <div className="w-20 h-20 rounded-full bg-brand-light border border-primary/30
+                                  flex items-center justify-center text-primary mb-6">
+                    <svg className="w-9 h-9" fill="none" stroke="currentColor" strokeWidth={1.5}
+                      viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
                   </div>
                   <h3 className="font-title text-2xl font-bold text-ink mb-3">
                     Mensagem Enviada!

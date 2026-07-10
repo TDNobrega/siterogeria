@@ -10,11 +10,12 @@ export default function Document() {
         <link rel="dns-prefetch" href="//wa.me" />
         <link rel="dns-prefetch" href="//api.whatsapp.com" />
 
-        {/* Google Fonts — DM Sans + Nunito Sans */}
+        {/* Google Fonts — Cormorant Garamond (títulos, serif clássica alinhada ao
+            banner da marca) + DM Sans + Nunito Sans */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;1,6..12,400&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;1,6..12,400&display=swap"
           rel="stylesheet"
         />
 

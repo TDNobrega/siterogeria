@@ -21,8 +21,8 @@ const config: Config = {
         border: '#E8E8E8',   // default borders
       },
       fontFamily: {
-        // URW Form → DM Sans (geometric sans-serif, closest match)
-        title: ['"URW Form"', '"DM Sans"', 'system-ui', 'sans-serif'],
+        // Cormorant Garamond — serif clássica, alinhada à tipografia do banner da marca
+        title: ['"Cormorant Garamond"', 'Georgia', 'serif'],
         // Avenir LT Std → Nunito Sans (humanist, closest match)
         subtitle: ['"Avenir LT Std"', '"Nunito Sans"', 'sans-serif'],
         // Body — clean sans-serif

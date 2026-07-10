@@ -3,7 +3,6 @@ import { WHATSAPP_URL } from '../lib/constants'
 const steps = [
   {
     number: '01',
-    icon: '💬',
     title: 'Contato Inicial',
     description:
       'Entre em contato pelo WhatsApp ou formulário. Nossa equipe responde rapidamente para entender sua situação e agendar uma conversa.',
@@ -11,7 +10,6 @@ const steps = [
   },
   {
     number: '02',
-    icon: '🔍',
     title: 'Análise do Caso',
     description:
       'Analisamos a documentação e os detalhes do seu caso com atenção. Identificamos os melhores caminhos jurídicos e apresentamos uma estratégia clara.',
@@ -19,7 +17,6 @@ const steps = [
   },
   {
     number: '03',
-    icon: '⚖️',
     title: 'Atuação Jurídica',
     description:
       'Iniciamos as providências necessárias — administrativas ou judiciais — e acompanhamos cada etapa, mantendo você informado sobre o andamento.',
@@ -27,7 +24,6 @@ const steps = [
   },
   {
     number: '04',
-    icon: '✅',
     title: 'Resolução do Seu Caso',
     description:
       'Trabalhamos incansavelmente até a resolução do seu caso. Seu direito é o nosso objetivo final.',
@@ -54,56 +50,34 @@ export default function HowItWorks() {
 
         {/* Steps */}
         <div className="relative">
-          {/* Connector line (desktop only) */}
-          <div className="hidden lg:block absolute top-16 left-1/2 -translate-x-1/2
+          {/* Connector line (desktop only) — passa pelo centro dos círculos */}
+          <div className="hidden lg:block absolute top-8 left-1/2 -translate-x-1/2
                           w-3/4 h-px bg-border" />
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step, index) => (
+            {steps.map((step) => (
               <div key={step.number} className="relative flex flex-col items-center text-center">
-                {/* Step number circle */}
-                <div className="relative mb-6">
-                  <div className="w-16 h-16 rounded-full bg-primary flex items-center
-                                  justify-center text-white font-title text-xl font-bold
-                                  shadow-button z-10 relative">
-                    {step.icon}
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-support
-                                  flex items-center justify-center text-white text-xs
-                                  font-subtitle font-bold">
-                    {index + 1}
-                  </div>
+                {/* Número da etapa — serif, círculo de traço fino */}
+                <div className="w-16 h-16 rounded-full border border-primary/40 bg-white
+                                flex items-center justify-center mb-6 z-10 relative">
+                  <span className="font-title text-2xl font-semibold text-primary leading-none">
+                    {step.number}
+                  </span>
                 </div>
 
                 {/* Content */}
-                <div className="card p-6 w-full hover:border-primary/30 transition-colors">
-                  <span className="font-title text-5xl font-bold text-secondary/40
-                                   leading-none block mb-3">
-                    {step.number}
-                  </span>
-                  <h3 className="font-title text-xl font-bold text-ink mb-3">
+                <div className="w-full">
+                  <h3 className="font-title text-2xl font-semibold text-ink mb-3">
                     {step.title}
                   </h3>
-                  <p className="font-body text-muted text-sm leading-relaxed mb-4">
+                  <p className="font-body text-muted text-sm leading-relaxed mb-3">
                     {step.description}
                   </p>
-                  <span className="inline-block bg-brand-light text-primary text-xs
-                                   font-subtitle font-semibold px-3 py-1 rounded-full
-                                   border border-primary/20">
+                  <span className="font-subtitle text-xs font-semibold tracking-[0.12em]
+                                   uppercase text-primary">
                     {step.highlight}
                   </span>
                 </div>
-
-                {/* Arrow connector (mobile/tablet) */}
-                {index < steps.length - 1 && (
-                  <div className="lg:hidden flex items-center justify-center mt-4">
-                    <svg className="w-6 h-6 text-primary rotate-90 sm:rotate-0"
-                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </div>
-                )}
               </div>
             ))}
           </div>

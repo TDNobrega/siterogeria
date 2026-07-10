@@ -163,7 +163,7 @@ export default function Footer() {
                 CNPJ: {FIRM_CNPJ}
               </p>
               <p className="font-body text-gray-500 text-xs leading-relaxed">
-                ⚖️ Inscrita na OAB/RJ. Advocacia exercida nos termos do Estatuto da OAB e
+                Inscrita na OAB/RJ. Advocacia exercida nos termos do Estatuto da OAB e
                 do Código de Ética e Disciplina.
               </p>
             </div>

@@ -6,12 +6,12 @@ export default function Hero() {
       id="inicio"
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ink"
     >
-      {/* ── Fundo — colunas clássicas (foto), tratamento escuro/dourado ──── */}
-      {/* Foto: Patrick Fore / Unsplash License (uso livre e comercial) */}
+      {/* ── Fundo — biblioteca jurídica clássica, tratamento escuro/dourado ── */}
+      {/* Foto: Iñaki del Olmo / Unsplash License (uso livre e comercial) */}
       <picture>
-        <source srcSet="/assets/hero-columns.webp" type="image/webp" />
+        <source srcSet="/assets/hero-bg.webp" type="image/webp" />
         <img
-          src="/assets/hero-columns.jpg"
+          src="/assets/hero-bg.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover"
@@ -21,48 +21,64 @@ export default function Hero() {
         />
       </picture>
 
-      {/* Brilho dourado suave atrás do título */}
+      {/* Overlay — escurece a foto pra manter contraste do texto e do banner */}
+      <div className="absolute inset-0 bg-ink/80" />
+
+      {/* Brilho dourado suave atrás do banner */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(ellipse 60% 45% at 50% 8%, rgba(197,151,58,0.30), transparent 70%)',
+            'radial-gradient(ellipse 55% 40% at 50% 32%, rgba(197,151,58,0.22), transparent 70%)',
         }}
       />
 
       {/* Textura de grão — reforça a profundidade sobre a foto */}
       <div className="absolute inset-0 grain-overlay opacity-[0.05] pointer-events-none" />
 
-      {/* Overlay — escurece a foto pra manter contraste do texto */}
-      <div className="absolute inset-0 bg-ink/75" />
-      <div className="absolute inset-0 bg-primary/10" />
-
       <div className="relative z-10 container-max mx-auto px-4 sm:px-6 lg:px-8
-                      text-center py-16">
+                      text-center py-24">
 
-        {/* H1 */}
-        <h1 className="font-title font-bold text-white leading-[1.1]
-                       text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem]
-                       max-w-4xl mx-auto mb-6 animate-fade-up">
-          Advocacia Especializada para{' '}
-          <span className="text-secondary">Servidores Públicos</span>{' '}
-          e{' '}
-          <span className="text-secondary">Direito Previdenciário</span>{' '}
-          em Campo Grande, RJ
+        {/* ── Banner da marca — PNG transparente, só a arte dourada ────────── */}
+        <picture>
+          <source srcSet="/assets/banner-logo.webp" type="image/webp" />
+          <img
+            src="/assets/banner-logo.png"
+            alt="Rogéria Oliveira Advocacia"
+            className="mx-auto w-full max-w-md sm:max-w-lg lg:max-w-xl animate-fade-up
+                       drop-shadow-[0_2px_24px_rgba(0,0,0,0.55)]"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
+
+        {/* Filete dourado */}
+        <div className="mt-10 mb-8 flex items-center justify-center gap-4">
+          <span className="block w-16 h-px bg-gradient-to-r from-transparent to-primary/70" />
+          <span className="block w-1.5 h-1.5 rotate-45 border border-primary/80" />
+          <span className="block w-16 h-px bg-gradient-to-l from-transparent to-primary/70" />
+        </div>
+
+        {/* H1 — apresentação (mantém termos de SEO) */}
+        <h1 className="font-title font-medium text-white leading-snug
+                       text-2xl sm:text-3xl lg:text-4xl
+                       max-w-3xl mx-auto mb-6 animate-fade-up">
+          Advocacia especializada em{' '}
+          <em className="not-italic text-secondary">Direito Previdenciário</em>{' '}
+          e na defesa de{' '}
+          <em className="not-italic text-secondary">Servidores Públicos</em>
+          <span className="block mt-2 text-lg sm:text-xl text-white/70 font-title italic">
+            Campo Grande · Rio de Janeiro · Atendimento em todo o Brasil
+          </span>
         </h1>
 
-        {/* Divider */}
-        <div className="w-12 h-px bg-primary mx-auto mb-7" />
-
-        {/* Sub-headline */}
-        <p className="font-body text-white/80 text-lg sm:text-xl
-                      max-w-2xl mx-auto mb-4 leading-relaxed animate-fade-up">
-          Descontos indevidos no contracheque? Benefício negado pelo INSS?
-          Aposentadoria travada? Nós resolvemos.
-        </p>
-        <p className="font-body text-white/60 text-base max-w-xl mx-auto mb-12">
-          Atendemos professores e trabalhadores com problemas previdenciários
-          em todo o Brasil.
+        {/* Apresentação do escritório */}
+        <p className="font-body text-white/75 text-base sm:text-lg
+                      max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-up">
+          Um escritório dedicado a proteger o que você construiu: aposentadorias,
+          benefícios do INSS e direitos do servidor, conduzidos com escuta atenta,
+          técnica e transparência do início ao fim.
         </p>
 
         {/* CTAs */}
@@ -77,29 +93,29 @@ export default function Hero() {
             Fale Comigo
           </a>
           <a
-            href="#servicos"
+            href="#sobre"
             className="btn-ghost w-full sm:w-auto"
           >
-            Ver Serviços
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2}
-              viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
+            Conheça o Escritório
           </a>
         </div>
 
-        {/* Trust strip */}
-        <div className="mt-16 flex flex-wrap items-center justify-center gap-8 animate-fade-up">
+        {/* Linha de confiança — sem emojis, tipografia discreta */}
+        <div className="mt-16 flex flex-wrap items-center justify-center
+                        gap-x-3 gap-y-2 animate-fade-up">
           {[
-            { icon: '⚖️', text: 'Direito dos Servidores Públicos' },
-            { icon: '🏛️', text: 'Direito Previdenciário' },
-            { icon: '💼', text: 'Direito Trabalhista' },
-          ].map((item) => (
-            <div key={item.text}
-              className="flex items-center gap-2 text-white/60">
-              <span className="text-base">{item.icon}</span>
-              <span className="font-subtitle text-xs tracking-wide">{item.text}</span>
-            </div>
+            'OAB/RJ 239.339',
+            'Primeira consulta gratuita',
+            'Atendimento presencial e online',
+          ].map((item, i) => (
+            <span key={item} className="flex items-center gap-3">
+              {i > 0 && (
+                <span className="hidden sm:block w-1 h-1 rounded-full bg-primary/60" />
+              )}
+              <span className="font-subtitle text-xs tracking-[0.18em] uppercase text-white/55">
+                {item}
+              </span>
+            </span>
           ))}
         </div>
       </div>

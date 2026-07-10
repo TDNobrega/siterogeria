@@ -49,15 +49,17 @@ body {
 /* ── Typography Scale ────────────────────────────────────────────────────── */
 @layer base {
   h1, h2, h3, h4 {
-    font-family: 'URW Form', 'DM Sans', system-ui, sans-serif;
-    font-weight: 700;
+    /* Serif clássica — mesma família visual do banner da marca */
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 600;
     color: #1A1A1A;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.005em;
   }
-  p, li, span {
+  p, li {
     font-family: 'Nunito Sans', 'DM Sans', sans-serif;
     line-height: 1.7;
   }
+  /* span herda do pai — destaque dourado dentro de h1-h4 mantém a serif */
 }
 
 /* ── Component Layer ─────────────────────────────────────────────────────── */
@@ -80,8 +82,9 @@ body {
     background-color: theme('colors.primary');
   }
   .section-title {
-    @apply font-title font-bold leading-tight
-           text-3xl md:text-4xl lg:text-[2.5rem];
+    /* Cormorant renderiza menor por em — escala um degrau acima da sans anterior */
+    @apply font-title font-semibold leading-[1.15]
+           text-4xl md:text-5xl lg:text-[3.25rem];
     color: theme('colors.ink');
   }
   .section-subtitle {

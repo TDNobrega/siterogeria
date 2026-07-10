@@ -131,7 +131,7 @@ export default function Testimonials() {
             Ver mais avaliações no Google
           </a>
           <p className="font-body text-muted text-sm mt-3">
-            ⭐ 5.0 · Avaliações verificadas no Google
+            5.0 · Avaliações verificadas no Google
           </p>
         </div>
       </div>
