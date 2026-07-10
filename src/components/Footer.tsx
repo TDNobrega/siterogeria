@@ -157,13 +157,13 @@ export default function Footer() {
               </li>
             </ul>
 
-            {/* CNPJ + OAB Notice */}
+            {/* CNPJ Notice */}
             <div className="mt-6 p-3 rounded-lg bg-white/5 border border-white/10 space-y-2">
               <p className="font-subtitle text-gray-400 text-xs font-semibold tracking-wide">
                 CNPJ: {FIRM_CNPJ}
               </p>
               <p className="font-body text-gray-500 text-xs leading-relaxed">
-                Inscrita na OAB/RJ. Advocacia exercida nos termos do Estatuto da OAB e
+                Advocacia exercida nos termos do Estatuto da Advocacia e
                 do Código de Ética e Disciplina.
               </p>
             </div>

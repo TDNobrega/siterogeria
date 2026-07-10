@@ -86,8 +86,8 @@ export default function Hero() {
         <div className="mt-4 flex flex-wrap items-center justify-center
                         gap-x-3 gap-y-2 animate-fade-up">
           {[
-            'OAB/RJ 239.339',
             'Atendimento presencial e online',
+            'Atuação em todo o Brasil',
           ].map((item, i) => (
             <span key={item} className="flex items-center gap-3">
               {i > 0 && (

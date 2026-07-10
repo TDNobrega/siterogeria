@@ -720,7 +720,7 @@ export default function Professores() {
                             justify-between gap-3 text-xs font-subtitle text-white/40">
               <p>© 2025 {FIRM_NAME}. Todos os direitos reservados.</p>
               <div className="flex items-center gap-4">
-                <p>CNPJ: {FIRM_CNPJ} · Inscrita na OAB/RJ</p>
+                <p>CNPJ: {FIRM_CNPJ}</p>
                 <a href="/privacidade" className="hover:text-white transition-colors whitespace-nowrap">
                   Política de Privacidade
                 </a>

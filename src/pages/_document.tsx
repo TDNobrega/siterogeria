@@ -41,12 +41,7 @@ export default function Document() {
                 "addressRegion": "RJ",
                 "addressCountry": "BR"
               },
-              "telephone": "+55-21-96940-1414",
-              "memberOf": {
-                "@type": "Organization",
-                "name": "OAB/RJ",
-                "identifier": "239.339"
-              }
+              "telephone": "+55-21-96940-1414"
             })
           }}
         />

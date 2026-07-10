@@ -42,8 +42,8 @@ export default function Privacidade() {
             <section>
               <h2 className="font-title font-bold text-xl text-ink mb-3">1. Quem somos</h2>
               <p>
-                <strong>{FIRM_NAME}</strong>, inscrita no CNPJ sob o n.º {FIRM_CNPJ} e na
-                OAB/RJ, é responsável pelo tratamento dos dados pessoais coletados neste
+                <strong>{FIRM_NAME}</strong>, inscrita no CNPJ sob o n.º {FIRM_CNPJ},
+                é responsável pelo tratamento dos dados pessoais coletados neste
                 site (<strong>rogeriaoliveira.com</strong>) e na landing page
                 (<strong>rogeriaoliveira.com/professores</strong>).
               </p>
@@ -108,7 +108,7 @@ export default function Privacidade() {
                 </li>
                 <li>
                   <strong>Obrigação legal (Art. 7º, II):</strong> para cumprimento de
-                  normas do Estatuto da OAB.
+                  normas do Estatuto da Advocacia.
                 </li>
               </ul>
             </section>
