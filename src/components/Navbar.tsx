@@ -70,16 +70,17 @@ export default function Navbar() {
   }, [processOpen])
 
   return (
-    <header className={`fixed inset-x-0 top-0 z-50 bg-ink transition-shadow duration-300
-                        ${scrolled ? 'shadow-[0_1px_0_0_rgba(255,255,255,0.08)]' : ''}`}>
+    <header className={`fixed inset-x-0 top-0 z-50 bg-white border-b border-border
+                        transition-shadow duration-300
+                        ${scrolled ? 'shadow-[0_2px_12px_0_rgba(0,0,0,0.06)]' : ''}`}>
       <div className="container-max mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
 
-          {/* Logo */}
+          {/* Logo — banner bronze (versão pra fundo claro) */}
           <Link href="/" className="flex-shrink-0">
             <div className="relative h-12 w-44">
               <Image
-                src="/assets/logo.png"
+                src="/assets/banner-logo-dark.png"
                 alt={FIRM_NAME}
                 fill
                 sizes="176px"
@@ -95,8 +96,8 @@ export default function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="font-subtitle text-sm font-medium text-white/70
-                           hover:text-white transition-colors tracking-wide"
+                className="font-subtitle text-sm font-medium text-muted
+                           hover:text-ink transition-colors tracking-wide"
               >
                 {l.label}
               </Link>
@@ -114,7 +115,7 @@ export default function Navbar() {
                 aria-expanded={processOpen}
                 aria-haspopup="true"
                 className="flex items-center gap-1.5 font-subtitle text-sm font-medium
-                           text-white/70 hover:text-white transition-colors tracking-wide"
+                           text-muted hover:text-ink transition-colors tracking-wide"
               >
                 Ver Processo
                 <ChevronIcon open={processOpen} />
@@ -122,7 +123,7 @@ export default function Navbar() {
 
               {processOpen && (
                 <div className="absolute right-0 top-full pt-3 w-64">
-                  <div className="bg-ink border border-white/10 rounded-xl shadow-2xl
+                  <div className="bg-white border border-border rounded-xl shadow-xl
                                   py-2 overflow-hidden">
                     {processLinks.map((p) => (
                       <a
@@ -131,8 +132,8 @@ export default function Navbar() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center justify-between gap-3 px-4 py-2.5
-                                   font-subtitle text-sm text-white/70 hover:text-white
-                                   hover:bg-white/5 transition-colors"
+                                   font-subtitle text-sm text-muted hover:text-ink
+                                   hover:bg-brand-light transition-colors"
                       >
                         {p.label}
                         <ExternalIcon />
@@ -156,7 +157,7 @@ export default function Navbar() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setOpen(!open)}
-            className="lg:hidden p-2 text-white/70 hover:text-white transition-colors"
+            className="lg:hidden p-2 text-muted hover:text-ink transition-colors"
             aria-label="Abrir menu"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2}
@@ -171,14 +172,14 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="lg:hidden border-t border-white/10 bg-ink px-4 py-5 space-y-1">
+        <div className="lg:hidden border-t border-border bg-white px-4 py-5 space-y-1">
           {navLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className="block font-subtitle text-sm font-medium text-white/70
-                         hover:text-white py-2.5 border-b border-white/10
+              className="block font-subtitle text-sm font-medium text-muted
+                         hover:text-ink py-2.5 border-b border-border
                          transition-colors"
             >
               {l.label}
@@ -186,12 +187,12 @@ export default function Navbar() {
           ))}
 
           {/* Accordion — Ver Processo */}
-          <div className="border-b border-white/10">
+          <div className="border-b border-border">
             <button
               onClick={() => setProcessOpenMobile(!processOpenMobile)}
               aria-expanded={processOpenMobile}
               className="w-full flex items-center justify-between font-subtitle text-sm
-                         font-medium text-white/70 hover:text-white py-2.5 transition-colors"
+                         font-medium text-muted hover:text-ink py-2.5 transition-colors"
             >
               Ver Processo
               <ChevronIcon open={processOpenMobile} />
@@ -205,7 +206,7 @@ export default function Navbar() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between gap-3 pl-4 pr-1 py-2
-                               font-subtitle text-sm text-white/60 hover:text-white
+                               font-subtitle text-sm text-muted hover:text-ink
                                transition-colors"
                   >
                     {p.label}
