@@ -1,45 +1,39 @@
 const testimonials = [
   {
-    name: 'Maria Aparecida S.',
-    role: 'Professora Municipal – Rio de Janeiro',
+    name: 'VALRJ Silva',
     stars: 5,
-    text: 'Tive descontos indevidos no meu contracheque por quase dois anos. Tentei resolver sozinha, sem sucesso. Com a Dra. Rogéria consegui tudo de volta. Atendimento humano e profissional do início ao fim.',
-    initial: 'M',
+    text: 'Ótimo atendimento, muito atenciosa. Faço questão de deixar os agradecimentos pelo profissionalismo da Dra. Rogéria Oliveira Advocacia.',
+    initial: 'V',
   },
   {
-    name: 'José Carlos F.',
-    role: 'Aposentado – Campo Grande, RJ',
+    name: 'Genilson S. Alves',
     stars: 5,
-    text: 'O INSS havia negado meu auxílio-doença duas vezes. Depois de contratar o escritório, entramos com recurso e conseguimos o benefício. Não precisei sair de casa para nada, tudo foi resolvido à distância. Recomendo muito!',
+    text: 'Trabalho de excelência. Capacidade profissional nível prêmio. Atendimento rápido e de alta qualidade.',
+    initial: 'G',
+  },
+  {
+    name: 'Wanderson Simões',
+    stars: 5,
+    text: 'Doutora Rogéria Oliveira, advogada que tem vasto conhecimento das matérias de Direito Previdenciário, Cível, Penal e do Consumidor. Atende os clientes de forma humanizada e com o conhecimento jurídico atualizado, transmitindo com segurança a melhor defesa nos embates jurídicos.',
+    initial: 'W',
+  },
+  {
+    name: 'Francisco Pacheco (Kiko)',
+    stars: 5,
+    text: 'Muito bom o atendimento do escritório de advocacia e da Dra. Rogéria Oliveira.',
+    initial: 'F',
+  },
+  {
+    name: 'Julio Nascimento',
+    stars: 5,
+    text: 'Minha experiência foi muito maravilhosa e satisfatória, vocês estão de parabéns.',
     initial: 'J',
   },
   {
-    name: 'Ana Lúcia M.',
-    role: 'Professora Estadual – RJ',
+    name: 'Alex Serra',
     stars: 5,
-    text: 'Estava lutando para conseguir minha aposentadoria especial como professora há mais de um ano. A equipe da Rogéria Advocacia entrou com a ação e consegui meu benefício. Ótima equipe, muito competente!',
+    text: 'Ótimo atendimento, fomos orientados super bem... trabalho de nível premium.',
     initial: 'A',
-  },
-  {
-    name: 'Roberto Mendes',
-    role: 'Servidor Público – Rio de Janeiro',
-    stars: 5,
-    text: 'Minha mãe precisava do BPC/LOAS e o INSS tinha negado o pedido. Com a ajuda da Dra. Rogéria conseguimos reverter a decisão judicialmente. Excelente profissional, muito dedicada ao caso da nossa família.',
-    initial: 'R',
-  },
-  {
-    name: 'Cláudia Pereira',
-    role: 'Professora de Educação Infantil',
-    stars: 5,
-    text: 'Fui demitida sem justa causa após 15 anos de magistério na rede privada. Não sabia quais eram meus direitos. O escritório me orientou, entrou com a ação e recebi todas as verbas rescisórias que a escola tentou me sonegar.',
-    initial: 'C',
-  },
-  {
-    name: 'Francisco Lima',
-    role: 'Trabalhador Informal – Campo Grande, RJ',
-    stars: 5,
-    text: 'Nunca imaginei que teria direito à aposentadoria por invalidez. Após dois infartos, o INSS negou meu pedido. A advogada Rogéria entrou com recurso e hoje recebo meu benefício todos os meses. Deus abençoe esse escritório!',
-    initial: 'F',
   },
 ]
 
@@ -106,7 +100,6 @@ export default function Testimonials() {
                   <p className="font-subtitle font-semibold text-ink text-sm truncate">
                     {t.name}
                   </p>
-                  <p className="font-body text-muted text-xs truncate">{t.role}</p>
                 </div>
                 <Stars count={t.stars} />
               </div>
