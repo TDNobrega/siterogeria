@@ -12,14 +12,12 @@ const navLinks = [
   { href: '/#depoimentos', label: 'Depoimentos' },
 ]
 
-// Consultas processuais e portais OAB — abrem em nova aba
+// Consultas processuais — abrem em nova aba
 const processLinks = [
-  { label: 'Consulta Trabalhista',    href: 'https://pje.trt1.jus.br/consultaprocessual/login' },
-  { label: 'Consulta Cível',          href: 'https://www.tjrj.jus.br/' },
-  { label: 'Consulta Federal',        href: 'https://eproc.jfrj.jus.br/eproc/externo_controlador.php?acao=principal' },
-  { label: 'Consulta Federal Antigo', href: 'https://balcaojus.trf2.jus.br/balcaojus/#/login' },
-  { label: 'OAB Federal',             href: 'https://www.oab.org.br/' },
-  { label: 'OAB Rio',                 href: 'https://www.oabrj.org.br/' },
+  { label: 'Consulta Trabalhista',            href: 'https://pje.trt1.jus.br/consultaprocessual/consulta-cidadao' },
+  { label: 'Consulta Federal Previdenciário', href: 'https://eproc-consulta.jfrj.jus.br/eproc/externo_controlador.php?acao=processo_consulta_publica' },
+  { label: 'Cível PJe',                       href: 'https://tjrj.pje.jus.br/pje/ConsultaPublica/listView.seam' },
+  { label: 'Cível e-eproc',                   href: 'https://eproc1g-cp.tjrj.jus.br/eproc/externo_controlador.php?acao=processo_consulta_publica' },
 ]
 
 function ChevronIcon({ open }: { open: boolean }) {
@@ -102,7 +100,7 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* Dropdown — Ver Processo */}
+            {/* Dropdown — Consulte seu Processo */}
             <div
               ref={dropdownRef}
               className="relative"
@@ -116,7 +114,7 @@ export default function Navbar() {
                 className="flex items-center gap-1.5 font-subtitle text-sm font-medium
                            text-muted hover:text-ink transition-colors tracking-wide"
               >
-                Ver Processo
+                Consulte seu Processo
                 <ChevronIcon open={processOpen} />
               </button>
 
@@ -185,7 +183,7 @@ export default function Navbar() {
             </Link>
           ))}
 
-          {/* Accordion — Ver Processo */}
+          {/* Accordion — Consulte seu Processo */}
           <div className="border-b border-border">
             <button
               onClick={() => setProcessOpenMobile(!processOpenMobile)}
@@ -193,7 +191,7 @@ export default function Navbar() {
               className="w-full flex items-center justify-between font-subtitle text-sm
                          font-medium text-muted hover:text-ink py-2.5 transition-colors"
             >
-              Ver Processo
+              Consulte seu Processo
               <ChevronIcon open={processOpenMobile} />
             </button>
             {processOpenMobile && (
