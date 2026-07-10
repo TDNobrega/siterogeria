@@ -4,23 +4,26 @@ export default function Hero() {
       id="inicio"
       className="relative min-h-[62vh] flex items-center justify-center overflow-hidden bg-ink"
     >
-      {/* ── Fundo — textura escura lisa, clean, com luz suave ─────────────── */}
-      {/* Foto: Unsplash License (uso livre e comercial) */}
+      {/* ── Fundo — martelo de juiz sobre preto, clean e jurídico ─────────── */}
+      {/* Foto: Tingey Injury Law Firm / Unsplash License (uso livre e comercial) */}
       <picture>
-        <source srcSet="/assets/hero-bg2.webp" type="image/webp" />
+        <source srcSet="/assets/hero-bg3.webp" type="image/webp" />
         <img
-          src="/assets/hero-bg2.jpg"
+          src="/assets/hero-bg3.jpg"
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover brightness-[.8]
+                     lg:scale-[1.45] lg:translate-x-[14%] lg:translate-y-[8%]"
           loading="eager"
           fetchPriority="high"
           decoding="async"
         />
       </picture>
 
-      {/* Overlay leve — a textura já é escura, só uniformiza o contraste */}
-      <div className="absolute inset-0 bg-ink/40" />
+      {/* Overlay — escurece a zona central/esquerda (texto) e preserva o
+          martelo visível à direita */}
+      <div className="absolute inset-0 bg-ink/45" />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink/65 via-ink/55 to-transparent" />
 
       {/* Brilho dourado suave atrás do banner */}
       <div
