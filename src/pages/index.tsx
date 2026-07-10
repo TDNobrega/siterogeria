@@ -61,7 +61,7 @@ const Home: NextPage = () => {
         <meta name="twitter:image:alt" content="Rogéria Oliveira Advogada — Campo Grande, RJ" />
 
         {/* Performance — preload LCP images do Hero */}
-        <link rel="preload" as="image" href="/assets/hero-bg3.webp" type="image/webp" fetchPriority="high" />
+        <link rel="preload" as="image" href="/assets/hero-bg4.webp" type="image/webp" fetchPriority="high" />
         <link rel="preload" as="image" href="/assets/banner-logo.webp" type="image/webp" fetchPriority="high" />
 
         {/* Sitemap reference */}

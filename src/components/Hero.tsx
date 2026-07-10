@@ -4,16 +4,16 @@ export default function Hero() {
       id="inicio"
       className="relative min-h-[62vh] flex items-center justify-center overflow-hidden bg-ink"
     >
-      {/* ── Fundo — martelo de juiz sobre preto, clean e jurídico ─────────── */}
-      {/* Foto: Tingey Injury Law Firm / Unsplash License (uso livre e comercial) */}
+      {/* ── Fundo — balança da justiça, luz de janela, clean e jurídico ───── */}
+      {/* Foto: Pexels License (uso livre e comercial) */}
       <picture>
-        <source srcSet="/assets/hero-bg3.webp" type="image/webp" />
+        <source srcSet="/assets/hero-bg4.webp" type="image/webp" />
         <img
-          src="/assets/hero-bg3.jpg"
+          src="/assets/hero-bg4.jpg"
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover brightness-[.8]
-                     lg:scale-[1.45] lg:translate-x-[14%] lg:translate-y-[8%]"
+          className="absolute inset-0 w-full h-full object-cover object-[center_70%]
+                     lg:scale-110 lg:translate-x-[10%]"
           loading="eager"
           fetchPriority="high"
           decoding="async"
