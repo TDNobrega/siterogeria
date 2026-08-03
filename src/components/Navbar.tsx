@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { WHATSAPP_URL, FIRM_NAME } from '../lib/constants'
 
 const navLinks = [
-  { href: '/#sobre',       label: 'Início' },
   { href: '/#servicos',    label: 'Serviços' },
   { href: '/professores',  label: 'Professores' },
   { href: '/blog',         label: 'Artigos e Notícias' },
