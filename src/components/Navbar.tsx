@@ -16,7 +16,7 @@ const processLinks = [
   { label: 'Consulta Trabalhista',            href: 'https://pje.trt1.jus.br/consultaprocessual/consulta-cidadao' },
   { label: 'Consulta Federal Previdenciário', href: 'https://eproc-consulta.jfrj.jus.br/eproc/externo_controlador.php?acao=processo_consulta_publica' },
   { label: 'Cível PJe',                       href: 'https://tjrj.pje.jus.br/pje/ConsultaPublica/listView.seam' },
-  { label: 'Cível e-eproc',                   href: 'https://eproc1g-cp.tjrj.jus.br/eproc/externo_controlador.php?acao=processo_consulta_publica' },
+  { label: 'Cível E-proc',                    href: 'https://eproc1g-cp.tjrj.jus.br/eproc/externo_controlador.php?acao=processo_consulta_publica' },
 ]
 
 function ChevronIcon({ open }: { open: boolean }) {
