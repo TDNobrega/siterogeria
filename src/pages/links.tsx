@@ -1,8 +1,6 @@
 import Head from 'next/head'
-import { FIRM_NAME, FIRM_CNPJ } from '../lib/constants'
+import { FIRM_NAME, FIRM_CNPJ, FIRM_PHONE, WHATSAPP_URL } from '../lib/constants'
 
-const WA_GERAL     = 'https://wa.me/5521969742080?text=' + encodeURIComponent('Olá, gostaria de uma consulta gratuita.')
-const WA_PROF      = 'https://wa.me/5521983009815?text=' + encodeURIComponent('Olá, gostaria de analisar meu contracheque.')
 const IG_GERAL     = 'https://instagram.com/rogeriaoliveiraadvocacia'
 const IG_PROF      = 'https://instagram.com/rogeriaoliveira.advogada'
 const GMB_REVIEW   = 'https://g.page/r/CT0bwIw2AmllEBM/review'
@@ -16,17 +14,10 @@ const links = [
     variant: 'primary',
   },
   {
-    label: 'WhatsApp: Atendimento Direito Previdenciário',
-    sublabel: '(21) 96974-2080',
-    href: WA_GERAL,
+    label: 'Fale com a advogada',
+    sublabel: FIRM_PHONE,
+    href: WHATSAPP_URL,
     icon: '💬',
-    variant: 'whatsapp',
-  },
-  {
-    label: 'WhatsApp: Atendimento Professores/Servidores',
-    sublabel: '(21) 98300-9815 · Análise do contracheque',
-    href: WA_PROF,
-    icon: '📋',
     variant: 'whatsapp',
   },
   {
