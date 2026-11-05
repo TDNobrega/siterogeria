@@ -6,7 +6,7 @@ export default function Privacidade() {
   return (
     <>
       <Head>
-        <title>Política de Privacidade — {FIRM_NAME}</title>
+        <title>Política de Privacidade | {FIRM_NAME}</title>
         <meta name="description" content="Política de Privacidade e Cookies do escritório Rogéria Oliveira Advogada. Saiba como seus dados são coletados, usados e protegidos." />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://rogeriaoliveira.com/privacidade" />
@@ -33,7 +33,7 @@ export default function Privacidade() {
             Política de Privacidade e Cookies
           </h1>
           <p className="font-body text-muted text-sm mb-10">
-            Última atualização: 26 de março de 2026
+            Última atualização: 5 de novembro de 2026
           </p>
 
           <div className="prose prose-lg max-w-none font-body text-ink/80 space-y-10">
@@ -60,21 +60,26 @@ export default function Privacidade() {
               <p>Coletamos os seguintes dados pessoais:</p>
               <ul className="list-disc pl-6 mt-3 space-y-2">
                 <li>
-                  <strong>Formulário de contato (Google Forms):</strong> nome, e-mail,
-                  telefone e informações sobre sua situação jurídica, fornecidos
-                  voluntariamente por você.
+                  <strong>Formulário da página de professores:</strong> nome, telefone,
+                  e-mail (opcional), sua situação funcional e a mensagem que você escrever,
+                  fornecidos voluntariamente por você.
+                </li>
+                <li>
+                  <strong>Contracheque (opcional):</strong> se você escolher enviar, o arquivo
+                  do contracheque (PDF ou imagem), que contém dados financeiros e funcionais.
+                  Ele é usado só para a análise gratuita que você pediu.
                 </li>
                 <li>
                   <strong>WhatsApp:</strong> mensagens trocadas diretamente com o escritório.
                 </li>
                 <li>
                   <strong>Dados de navegação (cookies):</strong> endereço IP anonimizado,
-                  páginas visitadas, tempo de permanência, dispositivo e navegador — coletados
+                  páginas visitadas, tempo de permanência, dispositivo e navegador, coletados
                   apenas com seu consentimento.
                 </li>
                 <li>
                   <strong>Dados de anúncios:</strong> interações com anúncios (cliques,
-                  visualizações) via Google Ads e Meta Ads — coletados apenas com consentimento.
+                  visualizações) via Google Ads e Meta Ads, coletados apenas com consentimento.
                 </li>
               </ul>
             </section>
@@ -84,6 +89,8 @@ export default function Privacidade() {
               <h2 className="font-title font-bold text-xl text-ink mb-3">3. Para que usamos seus dados</h2>
               <ul className="list-disc pl-6 space-y-2">
                 <li>Responder às suas solicitações e prestar serviços advocatícios.</li>
+                <li>Analisar o contracheque enviado, quando você pede a análise gratuita.</li>
+                <li>Avisar a equipe do escritório quando chega um pedido novo (aviso interno só com o primeiro nome e o assunto).</li>
                 <li>Analisar o tráfego do site para melhoria contínua (Google Analytics).</li>
                 <li>Exibir anúncios relevantes a potenciais clientes (Google Ads, Meta Ads).</li>
                 <li>Cumprir obrigações legais e regulatórias.</li>
@@ -92,7 +99,7 @@ export default function Privacidade() {
 
             {/* 4 */}
             <section>
-              <h2 className="font-title font-bold text-xl text-ink mb-3">4. Base legal (LGPD — Lei 13.709/2018)</h2>
+              <h2 className="font-title font-bold text-xl text-ink mb-3">4. Base legal (LGPD, Lei 13.709/2018)</h2>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
                   <strong>Consentimento (Art. 7º, I):</strong> para cookies analíticos e
@@ -122,7 +129,7 @@ export default function Privacidade() {
               </p>
               <ul className="list-disc pl-6 mt-3 space-y-2">
                 <li>
-                  <strong>Google LLC:</strong> Google Forms (armazenamento de respostas),
+                  <strong>Google LLC:</strong> Google Workspace (e-mail do escritório),
                   Google Analytics (análise de tráfego) e Google Ads (publicidade). Política:{' '}
                   <a href="https://policies.google.com/privacy" target="_blank"
                     rel="noopener noreferrer" className="text-primary hover:underline">
@@ -143,6 +150,19 @@ export default function Privacidade() {
                 <li>
                   <strong>Vercel Inc.:</strong> hospedagem do site (servidores nos EUA,
                   com cláusulas contratuais padrão).
+                </li>
+                <li>
+                  <strong>Supabase Inc.:</strong> banco de dados onde ficam os pedidos do
+                  formulário e os contracheques enviados (servidores nos EUA, acesso restrito
+                  ao escritório).
+                </li>
+                <li>
+                  <strong>Digisac:</strong> plataforma de atendimento do escritório pelo WhatsApp.
+                </li>
+                <li>
+                  <strong>Telegram:</strong> aviso interno à equipe de que chegou um pedido novo,
+                  enviado por uma ferramenta de automação em servidor próprio do escritório
+                  (só primeiro nome e assunto, sem telefone nem documento).
                 </li>
               </ul>
               <p className="mt-3">
@@ -171,12 +191,12 @@ export default function Privacidade() {
                     </tr>
                     <tr>
                       <td className="px-4 py-3 font-semibold">Analíticos</td>
-                      <td className="px-4 py-3">Google Analytics — mede visitas e comportamento</td>
+                      <td className="px-4 py-3">Google Analytics, mede visitas e comportamento</td>
                       <td className="px-4 py-3 text-primary font-semibold">Necessário</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-3 font-semibold">Publicidade</td>
-                      <td className="px-4 py-3">Google Ads e Meta Pixel — rastreamento de conversões</td>
+                      <td className="px-4 py-3">Google Ads e Meta Pixel, rastreamento de conversões</td>
                       <td className="px-4 py-3 text-primary font-semibold">Necessário</td>
                     </tr>
                   </tbody>
@@ -194,6 +214,7 @@ export default function Privacidade() {
               <h2 className="font-title font-bold text-xl text-ink mb-3">7. Por quanto tempo guardamos seus dados</h2>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Dados de consulta jurídica:</strong> pelo prazo prescricional de 5 anos após o encerramento do atendimento.</li>
+                <li><strong>Pedidos do formulário e contracheques de quem não contratar o escritório:</strong> excluídos em até 12 meses após o último contato. Você pode pedir a exclusão antes, pelo e-mail abaixo.</li>
                 <li><strong>Dados de análise (cookies analíticos):</strong> até 26 meses, conforme padrão do Google Analytics.</li>
                 <li><strong>Dados de publicidade:</strong> até 180 dias, conforme políticas do Google e Meta.</li>
                 <li><strong>Preferência de cookies:</strong> 12 meses no seu navegador.</li>
@@ -271,7 +292,7 @@ export default function Privacidade() {
         <footer className="bg-ink text-white py-6 px-4 sm:px-6 mt-10">
           <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center
                           justify-between gap-3 text-xs font-subtitle text-white/40">
-            <p>© 2025 {FIRM_NAME}. Todos os direitos reservados.</p>
+            <p>© 2026 {FIRM_NAME}. Todos os direitos reservados.</p>
             <Link href="/" className="text-white/60 hover:text-white transition-colors">
               Voltar ao site principal
             </Link>
