@@ -50,12 +50,13 @@ export default function About() {
 
         {/* ── Título — cobre toda a largura, acima da foto e do texto ── */}
         <div className="text-center mb-14">
-          <h2 className="section-title mb-4">
+          {/* H1 da home (revisão 05/11/2026: a home não tinha H1) */}
+          <h1 className="section-title mb-4">
             Advocacia especializada em{' '}
             <span className="text-primary">Direito Previdenciário</span>{' '}
             e na defesa de{' '}
             <span className="text-primary">Servidores Públicos</span>
-          </h2>
+          </h1>
           <div className="divider mx-auto" />
         </div>
 

@@ -8,7 +8,7 @@ export default function Professores() {
   const [exitDismissed, setExitDismissed] = useState(false)
 
   // Form state
-  const [formData, setFormData] = useState({ nome: '', telefone: '', email: '', situacao: '', mensagem: '' })
+  const [formData, setFormData] = useState({ nome: '', telefone: '', email: '', situacao: '', mensagem: '', empresa_site: '' })
   const [formFile, setFormFile] = useState<File | null>(null)
   const [formSending, setFormSending] = useState(false)
   const [formSent, setFormSent] = useState(false)
@@ -492,6 +492,10 @@ export default function Professores() {
                   </div>
                 ) : (
                   <form onSubmit={handleFormSubmit}>
+                    {/* campo isca contra robôs: escondido de pessoas e de leitor de tela */}
+                    <input type="text" name="empresa_site" tabIndex={-1} autoComplete="off" aria-hidden="true"
+                      value={formData.empresa_site} onChange={e => setFormData({ ...formData, empresa_site: e.target.value })}
+                      style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }} />
                     <div className="grid sm:grid-cols-2 gap-5 mb-5">
                       <div>
                         <label className="block font-subtitle text-xs font-semibold text-ink mb-1.5 uppercase tracking-wide">Nome completo *</label>

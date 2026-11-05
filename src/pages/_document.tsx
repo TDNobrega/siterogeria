@@ -21,7 +21,7 @@ export default function Document() {
 
         {/* Favicons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="format-detection" content="telephone=no" />
 
         {/* Schema global — advogada reconhecida em todas as páginas */}

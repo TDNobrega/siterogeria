@@ -1,56 +1,33 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getAdminSupabase } from '../../lib/supabase'
 
-const LIDERHUB_KEY        = process.env.LIDERHUB_API_KEY        || ''
-const LIDERHUB_CONNECTION = process.env.LIDERHUB_CONNECTION_ID  || ''
-const LIDERHUB_AGENT      = process.env.LIDERHUB_AGENT_ID       || ''
+// Aviso de lead novo: vai para um webhook do n8n da VPS, que avisa no grupo de alertas do Telegram.
+// Substituiu o LiderHub (desligado em 17/07/2026; até 05/11 ninguém era avisado de lead do site).
+// Manda só o mínimo (primeiro nome, situação, se anexou contracheque); o resto fica no /admin.
+const AVISO_URL    = process.env.LEAD_AVISO_URL    || ''
+const AVISO_SECRET = process.env.LEAD_AVISO_SECRET || ''
 
-// ── Helpers LiderHub ──────────────────────────────────────────────────────────
-async function liderHubHeaders() {
-  return {
-    'x-company-key': LIDERHUB_KEY,
-    'Content-Type':  'application/json',
-    'User-Agent':    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    'Accept':        'application/json',
-    'Origin':        'https://chat.liderhub.ai',
-    'Referer':       'https://chat.liderhub.ai/',
+async function avisarLeadNovo(nome: string, situacao: string, temArquivo: boolean) {
+  if (!AVISO_URL || !AVISO_SECRET) {
+    console.error('[ERROR] aviso de lead: LEAD_AVISO_URL/LEAD_AVISO_SECRET não configurados')
+    return
   }
-}
-
-async function cadastrarContato(numero: string, nome: string, email: string) {
-  const body: Record<string, string> = {
-    connection: LIDERHUB_CONNECTION,
-    number:     numero,
-    name:       nome,
+  try {
+    const res = await fetch(AVISO_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'x-aviso-secret': AVISO_SECRET },
+      body:    JSON.stringify({
+        origem:   'site /professores',
+        nome:     nome.trim().split(/\s+/)[0],
+        situacao,
+        arquivo:  temArquivo,
+      }),
+      signal: AbortSignal.timeout(5000),
+    })
+    console.log('[INFO] aviso de lead:', res.status)
+  } catch (err) {
+    console.error('[ERROR] aviso de lead (lead já gravado):', err instanceof Error ? err.message : err)
   }
-  if (email)          body.email = email
-  if (LIDERHUB_AGENT) body.agent = LIDERHUB_AGENT
-
-  console.log('LiderHub: cadastrando contato')
-
-  const res = await fetch('https://api.liderhub.com.br/v1/contacts', {
-    method:  'POST',
-    headers: await liderHubHeaders(),
-    body:    JSON.stringify(body),
-  })
-
-  const rawText = await res.text()
-  console.log('LiderHub status:', res.status)
-  console.log('LiderHub raw response:', rawText)
-
-  return JSON.parse(rawText) as { exist: boolean; id?: string; created?: boolean }
-}
-
-async function enviarMensagem(contactId: string, content: string) {
-  await fetch('https://api.liderhub.com.br/v1/send/message', {
-    method:  'POST',
-    headers: await liderHubHeaders(),
-    body:    JSON.stringify({
-      contact:     contactId,
-      content,
-      messageType: 'conversation',
-    }),
-  })
 }
 
 // ── Extensões permitidas para upload ─────────────────────────────────────────
@@ -73,6 +50,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { nome, telefone, email, situacao, mensagem, arquivo_nome, arquivo_path } = req.body
+
+  // Campo isca (invisível para pessoas): robô que preenche tudo é ignorado sem saber
+  if (req.body?.empresa_site) return res.status(200).json({ ok: true })
 
   // Validação de campos obrigatórios
   if (!nome || !telefone || !situacao) {
@@ -123,27 +103,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (error) throw error
 
-    // 2. Integração LiderHub (erro aqui não bloqueia a resposta)
-    if (LIDERHUB_KEY && LIDERHUB_CONNECTION) {
-      try {
-        const tel    = (telefone as string).replace(/\D/g, '')
-        const numero = tel.startsWith('55') ? tel : '55' + tel
-
-        const contato = await cadastrarContato(numero, nome, email || '')
-        console.log('LiderHub contato:', JSON.stringify(contato))
-
-        const contactId = contato.id
-        if (contactId) {
-          const primeiroNome = (nome as string).split(' ')[0]
-          await enviarMensagem(
-            contactId,
-            `Olá, ${primeiroNome}! 👋\n\nRecebemos sua solicitação de análise gratuita do contracheque.\n\nNossa equipe jurídica já está avaliando o seu caso e em breve entraremos em contato.\n\n*Rogéria Oliveira Advocacia* ⚖️`
-          )
-        }
-      } catch (liderErr) {
-        console.error('LiderHub error (non-fatal):', liderErr)
-      }
-    }
+    // 2. Aviso para a equipe (falha aqui não perde o lead, que já está gravado)
+    await avisarLeadNovo(String(nome), String(situacao), Boolean(arquivo_path))
 
     return res.status(200).json({ ok: true })
   } catch (err) {

@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
 import type { GetServerSideProps } from 'next'
 import Head from 'next/head'
-import crypto from 'crypto'
 import { getAdminSupabase } from '../lib/supabase'
+import { sessaoValida } from '../lib/admin-auth'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Lead = {
@@ -27,12 +27,6 @@ const STATUS: Record<Lead['status'], { label: string; color: string }> = {
   arquivado:  { label: 'Arquivado',   color: 'bg-gray-100 text-gray-500' },
 }
 
-function getAdminToken() {
-  return crypto
-    .createHmac('sha256', process.env.ADMIN_SALT || 'rogeria-admin-2025')
-    .update(process.env.ADMIN_PASSWORD || '')
-    .digest('hex')
-}
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Admin({ isAuthenticated, leads: initial }: Props) {
@@ -64,6 +58,7 @@ function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
       })
       if (res.ok) window.location.reload()
+      else if (res.status === 429) setError('Muitas tentativas. Aguarde 15 minutos.')
       else setError('Senha incorreta. Tente novamente.')
     } catch {
       setError('Erro de conexão.')
@@ -424,10 +419,7 @@ function Dashboard({ leads: initial }: { leads: Lead[] }) {
 
 // ── Server Side ───────────────────────────────────────────────────────────────
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const token    = req.cookies.admin_token
-  const expected = getAdminToken()
-
-  if (!token || token !== expected) {
+  if (!sessaoValida(req.cookies.admin_token)) {
     return { props: { isAuthenticated: false, leads: null } }
   }
 

@@ -3,26 +3,8 @@
 @tailwind utilities;
 
 /* ── Custom Font Files (place in /public/assets/fonts/ when available) ───── */
-@font-face {
-  font-family: 'URW Form';
-  src: url('/assets/fonts/URWForm-Regular.woff2') format('woff2');
-  font-weight: 400; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'URW Form';
-  src: url('/assets/fonts/URWForm-Bold.woff2') format('woff2');
-  font-weight: 700; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'Avenir LT Std';
-  src: url('/assets/fonts/AvenirLTStd-Roman.woff2') format('woff2');
-  font-weight: 400; font-style: normal; font-display: swap;
-}
-@font-face {
-  font-family: 'Avenir LT Std';
-  src: url('/assets/fonts/AvenirLTStd-Heavy.woff2') format('woff2');
-  font-weight: 700; font-style: normal; font-display: swap;
-}
+/* As fontes URW Form e Avenir LT Std nunca foram enviadas para /public/assets/fonts (404 em toda página,
+   visto na revisão de 05/11/2026). Removidas: o site já usava as reservas (Cormorant, Nunito Sans). */
 
 /* ── Base Reset ──────────────────────────────────────────────────────────── */
 html { scroll-behavior: smooth; overflow-x: hidden; }

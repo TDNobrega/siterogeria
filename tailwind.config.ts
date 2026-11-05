@@ -23,8 +23,8 @@ const config: Config = {
       fontFamily: {
         // Cormorant Garamond — serif clássica, alinhada à tipografia do banner da marca
         title: ['"Cormorant Garamond"', 'Georgia', 'serif'],
-        // Avenir LT Std → Nunito Sans (humanist, closest match)
-        subtitle: ['"Avenir LT Std"', '"Nunito Sans"', 'sans-serif'],
+        // Nunito Sans (a Avenir LT Std nunca foi enviada ao site; removida em 05/11/2026)
+        subtitle: ['"Nunito Sans"', 'sans-serif'],
         // Body — clean sans-serif
         body: ['"Nunito Sans"', '"DM Sans"', 'Inter', 'sans-serif'],
       },

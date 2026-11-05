@@ -1,20 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import crypto from 'crypto'
 import { getAdminSupabase } from '../../../lib/supabase'
+import { sessaoValida } from '../../../lib/admin-auth'
 
-function getAdminToken() {
-  const salt = process.env.ADMIN_SALT
-  const pass = process.env.ADMIN_PASSWORD
-  if (!salt || !pass) throw new Error('ADMIN_SALT e ADMIN_PASSWORD são obrigatórios.')
-  return crypto.createHmac('sha256', salt).update(pass).digest('hex')
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).end()
 
   // Verifica autenticação
-  const token = req.cookies.admin_token
-  if (!token || token !== getAdminToken()) {
+  if (!sessaoValida(req.cookies.admin_token)) {
     return res.status(401).json({ error: 'Não autorizado.' })
   }
 

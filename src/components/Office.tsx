@@ -1,4 +1,24 @@
+import { useEffect, useRef } from 'react'
+
 export default function Office() {
+  // Vídeo (2,1 MB) só baixa e toca quando aparece na tela. Antes tocava sozinho ao abrir a home e
+  // atrasava o carregamento no celular (LCP 4,1 s na revisão de 05/11/2026).
+  const videoRef = useRef<HTMLVideoElement>(null)
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v || !('IntersectionObserver' in window)) return
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        if (!v.src) v.src = '/assets/rogeria-video.mp4'
+        v.play().catch(() => { /* navegador pode recusar autoplay: fica a capa */ })
+      } else {
+        v.pause()
+      }
+    }, { rootMargin: '200px' })
+    obs.observe(v)
+    return () => obs.disconnect()
+  }, [])
+
   return (
     <section id="escritorio" className="section-padding bg-white">
       <div className="container-max mx-auto">
@@ -46,9 +66,11 @@ export default function Office() {
           {/* Vídeo da Dra. Rogéria */}
           <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[3/4] bg-black flex items-center justify-center">
             <video
-              src="/assets/rogeria-video.mp4"
+              ref={videoRef}
+              poster="/assets/rogeria-video-capa.webp"
+              preload="none"
+              aria-label="Vídeo de apresentação da Dra. Rogéria Oliveira"
               className="w-full h-full object-contain"
-              autoPlay
               loop
               muted
               playsInline

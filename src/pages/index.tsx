@@ -113,11 +113,6 @@ const Home: NextPage = () => {
                   { '@type': 'Offer', name: 'BPC/LOAS' },
                 ],
               },
-              aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '5.0',
-                reviewCount: '47',
-              },
               sameAs: [
                 'https://www.instagram.com/rogeriaoliveiraadvocacia',
                 'https://www.instagram.com/rogeriaoliveira.advogada',
