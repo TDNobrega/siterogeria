@@ -33,7 +33,7 @@ export default function Privacidade() {
             Política de Privacidade e Cookies
           </h1>
           <p className="font-body text-muted text-sm mb-10">
-            Última atualização: 5 de novembro de 2026
+            Última atualização: 6 de novembro de 2026
           </p>
 
           <div className="prose prose-lg max-w-none font-body text-ink/80 space-y-10">
@@ -70,7 +70,8 @@ export default function Privacidade() {
                   Ele é usado só para a análise gratuita que você pediu.
                 </li>
                 <li>
-                  <strong>WhatsApp:</strong> mensagens trocadas diretamente com o escritório.
+                  <strong>WhatsApp:</strong> mensagens trocadas com o escritório, inclusive
+                  áudios, fotos e documentos que você enviar.
                 </li>
                 <li>
                   <strong>Dados de navegação (cookies):</strong> endereço IP anonimizado,
@@ -90,6 +91,8 @@ export default function Privacidade() {
               <ul className="list-disc pl-6 space-y-2">
                 <li>Responder às suas solicitações e prestar serviços advocatícios.</li>
                 <li>Analisar o contracheque enviado, quando você pede a análise gratuita.</li>
+                <li>Fazer o primeiro atendimento pelo WhatsApp com uma assistente virtual, que entende sua dúvida e encaminha para a equipe.</li>
+                <li>Organizar e identificar os documentos que você envia (por exemplo, girar e recortar fotos de documentos).</li>
                 <li>Avisar a equipe do escritório quando chega um pedido novo (aviso interno só com o primeiro nome e o assunto).</li>
                 <li>Analisar o tráfego do site para melhoria contínua (Google Analytics).</li>
                 <li>Exibir anúncios relevantes a potenciais clientes (Google Ads, Meta Ads).</li>
@@ -158,6 +161,13 @@ export default function Privacidade() {
                 </li>
                 <li>
                   <strong>Digisac:</strong> plataforma de atendimento do escritório pelo WhatsApp.
+                </li>
+                <li>
+                  <strong>Serviços de inteligência artificial (Groq e OpenRouter):</strong> o texto
+                  das mensagens do WhatsApp, a transcrição dos áudios e as fotos de documentos são
+                  processados por esses serviços, com servidores nos EUA, só para gerar a resposta
+                  da assistente virtual e organizar os documentos. Esses serviços não guardam e
+                  não usam os seus dados para treinar modelos de inteligência artificial.
                 </li>
                 <li>
                   <strong>Telegram:</strong> aviso interno à equipe de que chegou um pedido novo,
